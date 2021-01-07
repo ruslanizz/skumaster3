@@ -1,0 +1,140 @@
+{% extends 'index.html' %}
+
+{% block my_content %}
+
+{% verbatim %}
+<div id="skuapp">
+
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+
+    <li class="breadcrumb-item" v-if="sku_data[0]"><a href="/">Сезон: {{sku_data[0]["get_season_name"]}}</a></li>
+    <li class="breadcrumb-item" v-if="sku_data[0]"><a href="javascript:history.go(-1)">Коллекция: {{sku_data[0]["get_capsule_name"]}}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Артикулы</li>
+
+  </ol>
+  </nav>
+
+<div class="container">
+      <div class="row">
+    <div class="col">
+      <h4>Артикулы</h4>
+    </div>
+    <div class="col">
+      <p class="text-end">Для сортировки по параметру - нажмите на него</p>
+    </div>
+  </div>
+</div>
+<!--{{sku_data[0]["name"]}}-->
+<!--img    style="width:200px; display:block; margin-left: auto; margin-right: auto;"-->
+
+<div class="container-fluid">
+    <div class="row">
+        <div v-for = "i in sortedSkuData">
+            <div class="col">
+                <div class="card text-center text-white bg-info" style="width: 19rem;">
+
+                        <img class ="card-img-top img-thumbnail" :src="i.img"  v-if="i.img" />
+
+                    <div class="card-body">
+
+                        <a v-on:click="sortParam='sku_firstletters'">
+                        <h2 class="card-title">{{i.sku_firstletters}}</h2>
+                        </a>
+                        <p class="card-text">
+                        <h4>{{i.name}}</h4>
+                        <br>
+                        Продано: {{i.sizes_quantity_sold}} шт.
+                        <br>
+                        <a v-on:click="sortParam='sizes_sellsumm_sold'">
+                        Сумма продаж: {{ i.sizes_sellsumm_sold | format }} р.
+                        </a>
+                        <br>
+                        --------------------------------
+<!--                        Себестоимость: {{ i.sizes_costsumm_sold | format }} р.-->
+                        <br>
+                        <a v-on:click="sortParam='sizes_income'">
+                        Доход: {{ i.sizes_income | format }} р.
+                        </a>
+                        <br>
+                        <a v-on:click="sortParam='margin_percent'">
+                        Наценка: {{ i.margin_percent }} %
+                        </a>
+                        <br>
+                        --------------------------------
+                        <br>
+                        В остатке: {{i.sizes_quantity_instock}} шт.
+                        <br>
+                        <a v-on:click="sortParam='sizes_costsumm_instock'">
+                        Себестоимость: {{ i.sizes_costsumm_instock | format }} р.
+                        </a>
+                        <br>
+
+                        </p>
+
+<!--                        Размеры-->
+
+<!--                        <div class="card-footer">-->
+
+                        <div class="container-fluid">
+
+                            <div v-for="r in i.sizes_grid" class="row no-gutters justify-content-center">
+
+                                    <div v-for="column in r" class="col text-truncate " style="height:25px;">
+<!--                                        <div class="col px-1">-->
+
+                                            <div v-if="column[1]==='INSTOCK'">
+                                                <p class="fs-6">
+                                                <span class="badge badge-warning">
+<!--                                                {{column[0]}}-->
+                                                    {{size_fit_to_column(r, column[0])}}
+                                                </span>
+                                                </p>
+                                            </div>
+
+
+                                            <div v-if="column[1]==='SOLD'">
+                                                <p class="fs-6">
+                                                <span class="badge badge-secondary">
+<!--                                                {{column[0]}}-->
+                                                    {{size_fit_to_column(r, column[0])}}
+                                                </span>
+                                                </p>
+                                            </div>
+
+
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            <br><br>
+            </div>
+
+        </div>
+    </div>
+</div>
+    <br><br>
+
+</div>
+
+
+
+{% endverbatim %}
+
+
+<script>
+// Выделяем из адресной строки номер сезона
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const capsule_number = urlParams.get('capsule')
+
+</script>
+<script src="/static/sku_app.js"></script>
+</body>
+</html>
+
+{% endblock %}

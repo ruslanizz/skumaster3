@@ -1,0 +1,51 @@
+{% extends 'index.html' %}
+
+{% block my_content %}
+<div class="jumbotron">
+  <h1 class="display-4">Загрузка новых данных</h1>
+  <p class="lead">Загрузите отчет, выгруженный из 1С "Продажа, остатки в днях торговли". <br>
+    В формате .xls или .xlsx </p>
+  <hr class="my-4">
+
+<div class = "container">
+    <br>
+    <h3> ЗАГРУЗИТЕ ФАЙЛ XLSX :</h3>
+    <form enctype="multipart/form-data" method="POST">
+    {% csrf_token %}
+{% verbatim %}
+    <div class="custom-file">
+        <input type="file" name = "xlsx_file" accept=".xlsx, .xls" class="custom-file-input" id="myFile">
+        <label class="custom-file-label" for="myFile">Выберите файл XLS или XLSX</label>
+    </div>
+
+    <br>
+    <br>
+         <button type="submit" class="btn btn-primary">Отправить</button>
+
+{% endverbatim %}
+
+    </form>
+
+
+
+<script>
+// Add the following code if you want the name of the file appear on select
+$(".custom-file-input").on("change", function() {
+  var fileName = $(this).val().split("\\").pop();
+  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+});
+</script>
+</div>
+    <br>
+    <br>
+
+</div>
+<br>
+
+
+
+<br>
+<br>
+
+
+{% endblock %}

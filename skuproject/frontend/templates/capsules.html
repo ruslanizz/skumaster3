@@ -1,0 +1,95 @@
+{% extends 'index.html' %}
+
+{% block my_content %}
+
+{% verbatim %}
+<div id="capsulesapp">
+
+<!--  <nav style="&#45;&#45;bs-breadcrumb-divider: '>';" aria-label="breadcrumb">-->
+  <nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <!--           <div v-if="sku_data[0]">-->
+    <li class="breadcrumb-item"><a href="/">Сезон: {{capsules_data[0].get_season_name}}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Коллекции</li>
+    <!--           </div>-->
+  </ol>
+  </nav>
+
+<div class="container">
+      <div class="row">
+    <div class="col">
+      <h4>Коллекции</h4>
+    </div>
+    <div class="col">
+      <p class="text-end">Для сортировки по параметру - нажмите на него</p>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div v-for = "i in sortedCapsulesData">
+            <div class="col">
+                <div class="card text-center text-white bg-info" style="width: 18rem;">
+                    <div class="card-body">
+                        <h2 class="card-title">
+                        <a :href="'/sku/?capsule=' + i.id" class="card-link text-white">{{i.name}}</a>
+                        </h2>
+                        <p class="card-text">
+
+                        <h5>
+                        <a v-on:click="sortParam='capsule_firstletters'">
+                        {{i.capsule_firstletters}}
+                        </a>
+                        </h5>
+                        <br>
+
+
+
+                        <a v-on:click="sortParam='sku_sellsumm_sold'">
+                        Продажи (розн.): {{i.sku_sellsumm_sold | format }} р.
+                        </a>
+                        <br>
+                        --------------------------------
+                        <br>
+                        <a v-on:click="sortParam='sku_income'">
+                        Доход: {{i.sku_income | format }} р.
+                        </a>
+                        <br>
+
+                        <a v-on:click="sortParam='sku_margin_percent'">
+                        Наценка: {{i.sku_margin_percent}} %
+                        </a>
+                        <br>
+                        --------------------------------
+                        <a v-on:click="sortParam='sku_costsumm_instock'">
+                        Остатки (закуп.): {{i.sku_costsumm_instock | format }} р.
+                        </a>
+
+                        <br>
+<!--                        Кол-во артикулов: {{i.sku_quantity}}-->
+<!--                        <br>-->
+
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endverbatim %}
+<script>
+// Выделяем из адресной строки номер сезона
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const season_number = urlParams.get('season')
+
+</script>
+<script src="/static/capsules_app.js"></script>
+</body>
+</html>
+
+{% endblock %}
