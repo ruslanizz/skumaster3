@@ -34,6 +34,26 @@ new Vue({
             else {
 //            console.log('LEAVE AS IS');
             return size};
+        },
+
+
+        just_instock_rows: function (full_grid){
+        // Убираем из таблицы строки, в которой нет ни одного "INSTOCK"
+            let newgrid = [];
+
+            for (let row of full_grid) {
+                let instock_counter = 0;
+                for (let col of row) {
+                    if (col[1]=='INSTOCK'){
+                        instock_counter +=1;
+                    }
+                };
+                if (instock_counter > 0) {
+                    newgrid.push(row);
+                    }
+
+            } ;
+            return newgrid
         }
 
     },
