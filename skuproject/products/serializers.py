@@ -10,10 +10,10 @@ class SeasonSerializer(ModelSerializer):
                   'id',
                   'img',
                   'season_firstletters',
-                  'user'
-                  # 'capsules_quantity',
-                  # 'capsules_sellsumm_sold',
-                  # 'capsules_income'
+                  'user',
+                  'capsules_quantity',
+                  'capsules_sellsumm_sold',
+                  'capsules_income'
                   ]
 
 
@@ -23,14 +23,15 @@ class CapsuleSerializer(ModelSerializer):
         fields = ['name',
                   'id',
                   'season',
+                  'img',
                   'capsule_firstletters',
                   'user',
-#                   'sku_quantity',
-#                   'sku_sellsumm_sold',
-#                   'sku_costsumm_instock',
-#                   'sku_income',
-#                   'sku_margin_percent',
-#                   'get_season_name'
+                  'sku_quantity',
+                  'sku_sellsumm_sold',
+                  'sku_costsumm_instock',
+                  'sku_income',
+                  'sku_margin_percent',
+                  'get_season_name'
                           ]
 
 
@@ -51,15 +52,15 @@ class SkuSerializer(ModelSerializer):
                   'capsule',
                   'img',
                   'user',
-#                   'sizes_quantity_sold',
-#                   'sizes_sellsumm_sold',
-#                   'sizes_costsumm_sold',
-#                   'sizes_income',
-#                   'sizes_quantity_instock',
-#                   'sizes_costsumm_instock',
-#                   'margin_percent',
-#                   'sizes_grid',
-#                   'get_season_name',
-#                   'get_capsule_name'
+                  'sizes_quantity_sold',
+                  'sizes_sellsumm_sold',
+                  'sizes_costsumm_sold',
+                  'sizes_income',
+                  'sizes_quantity_instock',
+                  'sizes_costsumm_instock',
+                  'margin_percent',
+                  'sizes_grid',
+                  'get_season_name',
+                  'get_capsule_name'
                   ]
 

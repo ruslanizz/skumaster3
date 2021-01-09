@@ -14,7 +14,7 @@ class UploadedBaseInfo(models.Model):
 class Season(models.Model):
     name = models.CharField(max_length=100, default='', blank=True)
     season_firstletters = models.CharField(max_length=7, default='', blank=False)
-    id = models.IntegerField(default=0, primary_key=True, editable=True)
+    id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     img = models.ImageField(upload_to="", default="default.png", )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -37,10 +37,11 @@ class Season(models.Model):
 
 
 class Capsule(models.Model):
-    capsule_firstletters = models.CharField(max_length=30, default='', blank=False, unique=True)
+    capsule_firstletters = models.CharField(max_length=30, default='', blank=False)
     name = models.CharField(max_length=50, default='', blank=True)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Сезон')
-    id = models.IntegerField(default=0, primary_key=True, editable=True)
+    img = models.ImageField(upload_to="", default="default.png", )
+    id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -79,9 +80,9 @@ class Capsule(models.Model):
 
 class SKU(models.Model):
     name = models.CharField(max_length=100, default='', blank=True)
-    sku_firstletters = models.CharField(max_length=15, default='', blank=False, unique=True)
+    sku_firstletters = models.CharField(max_length=15, default='', blank=False)
     capsule = models.ForeignKey(Capsule, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Капсула')
-    id = models.IntegerField(default=0, primary_key=True, editable=True)
+    id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     img = models.ImageField(upload_to="", default="default.png", )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 

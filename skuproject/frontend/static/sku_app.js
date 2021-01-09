@@ -2,7 +2,8 @@ new Vue({
     el:'#skuapp',
     data: {
         sortParam: '',
-        sku_data: []
+        sku_data: [],
+        checked: false
 
            },
 

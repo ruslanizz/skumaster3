@@ -101,7 +101,9 @@
     <div v-for="i in sortedSeasonData">
         <div class="col">
         <div class="card text-center text-white bg-primary" style="width: 18rem;">
+            <a :href="'/capsules/?season=' + i.id">
             <img class ="card-img-top img-thumbnail" :src="i.img" v-if="i.img" />
+            </a>
             <div class="card-body">
                 <h2 class="card-title">
                     <a :href="'/capsules/?season=' + i.id" class="card-link text-white">{{i.name}}</a>

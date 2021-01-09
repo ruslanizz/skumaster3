@@ -183,11 +183,19 @@ def handle_uploaded_file(xlsx_file, user_id):
             if not os.path.isfile(MEDIA_ROOT+'/'+image_season):
                 image_season = ''
 
+            # id назначаю сам, потому что сначала вся база создается в памяти, и только в конце будет bulk_create
+            # А так как мне надо установить уже все связи ForeignKey, мне уже нужно знать id
+            # поэтому сделал id типа CharField и вида 'номер строки-user id'
+            # то есть что-то типа '211-18'. Это должно быть уникальным id
+
+            string_id=str(row)+'-'+str(user_id.id)
+            print('string_id:',string_id)
+
             season_list.append(Season(season_firstletters=season,
                                       name = seasonname_from_config,
                                       img = image_season,
                                       user = user_id,
-                                      id=row))  #id назначаю сам, пусть будет номер строки
+                                      id=string_id))  #id назначаю сам
 
         # Добавим Capsule
         if capsule not in capsules_checklist:
@@ -197,11 +205,20 @@ def handle_uploaded_file(xlsx_file, user_id):
             except:
                 capsulename_from_config='----'
                 # print('Не нашлась в конфиге капсула')
+
+            image_capsule = season + '/' + capsule + '.jpg'
+            if not os.path.isfile(MEDIA_ROOT + '/' + image_capsule):
+                image_capsule = ''
+
             season_id=[i.id for i in season_list if i.season_firstletters == season][0]
             # print('season_id', season_id)
+
+            string_id=str(row)+'-'+str(user_id.id)
+
             capsule_list.append(Capsule(capsule_firstletters=capsule,
-                                        id=row,
+                                        id=string_id,
                                         name=capsulename_from_config,
+                                        img = image_capsule,
                                         user=user_id,
                                         season=Season(id=season_id)))   # корректно ли так писать? так то работает все
 
@@ -210,17 +227,20 @@ def handle_uploaded_file(xlsx_file, user_id):
         if sku_nosize not in skus_checklist:
             skus_checklist.append(sku_nosize)
 
-            image_file = season+'/'+capsule+'/'+sku_nosize + '.jpg'
-            if not os.path.isfile(MEDIA_ROOT+'/'+image_file):
-                image_file = ''
+            image_sku = season+'/'+capsule+'/'+sku_nosize + '.jpg'
+            if not os.path.isfile(MEDIA_ROOT+'/'+image_sku):
+                image_sku = ''
 
             capsule_id=[i.id for i in capsule_list if i.capsule_firstletters == capsule][0]
+
+            string_id=str(row)+'-'+str(user_id.id)
+
             sku_list.append(SKU(name=sheet.cell_value(row+1,col_name),
                                 sku_firstletters=sku_nosize,
-                                id=row,
+                                id=string_id,
                                 capsule=Capsule(id=capsule_id),
                                 user=user_id,
-                                img = image_file
+                                img = image_sku
             ))
 
         # Добавим Size

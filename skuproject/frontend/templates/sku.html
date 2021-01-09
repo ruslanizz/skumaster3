@@ -23,6 +23,12 @@
     <div class="col">
       <p class="text-end">Для сортировки по параметру - нажмите на него</p>
     </div>
+    <div class="col">
+        <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="CheckboxForSoldSizes" v-model="checked">
+        <label class="form-check-label" for="CheckboxForSoldSizes">Не показывать проданные размеры</label>
+        </div>
+    </div>
   </div>
 </div>
 <!--{{sku_data[0]["name"]}}-->
@@ -76,9 +82,12 @@
 
 <!--                        <div class="card-footer">-->
 
-                        <div class="container-fluid">
+                        <div class="container-fluid" v-if!="checked">
 
                             <div v-for="r in i.sizes_grid" class="row no-gutters justify-content-center">
+
+
+
 
                                     <div v-for="column in r" class="col text-truncate " style="height:25px;">
 <!--                                        <div class="col px-1">-->
@@ -93,7 +102,7 @@
                                             </div>
 
 
-                                            <div v-if="column[1]==='SOLD'">
+                                            <div v-if="column[1]==='SOLD' && checked===false">
                                                 <p class="fs-6">
                                                 <span class="badge badge-secondary">
 <!--                                                {{column[0]}}-->
@@ -102,9 +111,13 @@
                                                 </p>
                                             </div>
 
+                                    </div>
 
-                                        </div>
-                                </div>
+
+
+
+
+<!--                                </div>-->
                             </div>
                         </div>
 
