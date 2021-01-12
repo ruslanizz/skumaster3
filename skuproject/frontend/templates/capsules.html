@@ -35,16 +35,16 @@
                     <img class ="card-img-top img-thumbnail" :src="i.img" v-if="i.img" />
                     </a>
                     <div class="card-body">
-                        <h2 class="card-title">
+                        <h3 class="card-title">
                         <a :href="'/sku/?capsule=' + i.id" class="card-link text-white">{{i.name}}</a>
-                        </h2>
+                        </h3>
                         <p class="card-text">
 
-                        <h5>
+<!--                        <h5>-->
                         <a v-on:click="sortParam='capsule_firstletters'">
                         {{i.capsule_firstletters}}
                         </a>
-                        </h5>
+<!--                        </h5>-->
                         <br>
 
 

@@ -47,7 +47,8 @@ def get_size_short(sizelong):
 
 
 def string_to_decimal(string):
-    string = string.replace(' ','')
+    if isinstance(string, str):
+        string = string.replace(' ','')
     return Decimal(string)
 
 def string_to_integer(string):
