@@ -3,7 +3,7 @@ import os
 import xlrd
 from decimal import *
 
-from skuproject.settings import MEDIA_ROOT
+from skuproject.settings import STATIC_ROOT, STATIC_URL
 
 from .models import UploadedBaseInfo, SKU, Capsule, Season, Size
 import configparser
@@ -172,6 +172,7 @@ def handle_uploaded_file(xlsx_file, user_id):
         # print('season', season)
         # print('CAPSULE=', capsule)
         # print('MEDIA_ROOT', MEDIA_ROOT)
+        # print('STATIC_ROOT', STATIC_ROOT)
         # Добавим Season
         if season not in seasons_checklist:
             seasons_checklist.append(season)
@@ -181,8 +182,13 @@ def handle_uploaded_file(xlsx_file, user_id):
                 seasonname_from_config = '----'
                 # print('Не нашелся в конфиге сезон')
 
-            image_season = season+'/'+season + '.jpg'
-            if not os.path.isfile(MEDIA_ROOT+'/'+image_season):
+            filename = 'images/'+ season+'/'+season + '.jpg'
+            image_season = STATIC_URL + filename
+            # print('image_season', image_season)
+            # print('STATIC_ROOT', STATIC_ROOT)
+            # print('STATIC_ROOT+/+filename', STATIC_ROOT+'/'+filename)
+
+            if not os.path.isfile(STATIC_ROOT+'/'+filename):
                 image_season = ''
 
             # id назначаю сам, потому что сначала вся база создается в памяти, и только в конце будет bulk_create
@@ -208,8 +214,10 @@ def handle_uploaded_file(xlsx_file, user_id):
                 capsulename_from_config='----'
                 # print('Не нашлась в конфиге капсула')
 
-            image_capsule = season + '/' + capsule + '.jpg'
-            if not os.path.isfile(MEDIA_ROOT + '/' + image_capsule):
+            filename = 'images/' + season + '/' + capsule + '.jpg'
+            image_capsule = STATIC_URL + filename
+
+            if not os.path.isfile(STATIC_ROOT+'/' + filename):
                 image_capsule = ''
 
             season_id=[i.id for i in season_list if i.season_firstletters == season][0]
@@ -229,8 +237,10 @@ def handle_uploaded_file(xlsx_file, user_id):
         if sku_nosize not in skus_checklist:
             skus_checklist.append(sku_nosize)
 
-            image_sku = season+'/'+capsule+'/'+sku_nosize + '.jpg'
-            if not os.path.isfile(MEDIA_ROOT+'/'+image_sku):
+            filename = 'images/' + season+'/'+capsule+'/'+sku_nosize + '.jpg'
+            image_sku = STATIC_URL + filename
+
+            if not os.path.isfile(STATIC_ROOT+'/'+filename):
                 image_sku = ''
 
             capsule_id=[i.id for i in capsule_list if i.capsule_firstletters == capsule][0]
