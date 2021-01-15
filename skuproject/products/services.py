@@ -4,6 +4,7 @@ import xlrd
 from decimal import *
 
 from skuproject.settings import MEDIA_ROOT
+
 from .models import UploadedBaseInfo, SKU, Capsule, Season, Size
 import configparser
 
@@ -170,7 +171,7 @@ def handle_uploaded_file(xlsx_file, user_id):
         # print('sizelong', sizelong)
         # print('season', season)
         # print('CAPSULE=', capsule)
-
+        # print('MEDIA_ROOT', MEDIA_ROOT)
         # Добавим Season
         if season not in seasons_checklist:
             seasons_checklist.append(season)
