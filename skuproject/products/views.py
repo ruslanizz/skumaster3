@@ -48,9 +48,11 @@ def upload_file(request):
         print('Файл:', uploaded_xlsx_file.name)
         print('Размер файла:', uploaded_xlsx_file.size)
         print('--------------------------')
-        successfully_loaded=handle_uploaded_file(uploaded_xlsx_file, request.user)
+        successfully_loaded, error_message = handle_uploaded_file(uploaded_xlsx_file, request.user)
         if successfully_loaded:
             return HttpResponseRedirect('/')
+        else:
+            return render(request, 'open.html', {'message': error_message})
 
     return render(request,'open.html')
 

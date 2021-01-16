@@ -4,18 +4,24 @@
 <div class="jumbotron">
   <h1 class="display-4">Загрузка новых данных</h1>
   <p class="lead">Загрузите отчет, выгруженный из 1С "Продажа, остатки в днях торговли". <br>
-    В формате .xls или .xlsx </p>
+    В формате .xls (не .xlsx). </p>
   <hr class="my-4">
 
+    {% if message %}
+
+    <div class="alert alert-warning" role="alert">
+        Вы точно правильную таблицу загружаете? {{message}} !
+    </div>
+    {%endif%}
 <div class = "container">
     <br>
-    <h3> ЗАГРУЗИТЕ ФАЙЛ XLSX :</h3>
+    <h3> ЗАГРУЗИТЕ ФАЙЛ XLS :</h3>
     <form enctype="multipart/form-data" method="POST">
     {% csrf_token %}
 {% verbatim %}
     <div class="custom-file">
-        <input type="file" name = "xlsx_file" accept=".xlsx, .xls" class="custom-file-input" id="myFile">
-        <label class="custom-file-label" for="myFile">Выберите файл XLS или XLSX</label>
+        <input type="file" name = "xlsx_file" accept=".xls" class="custom-file-input" id="myFile">
+        <label class="custom-file-label" for="myFile">Выберите файл XLS</label>
     </div>
 
     <br>

@@ -22,15 +22,20 @@ def get_size_short(sizelong):
         t = sizelong.find('*')  # то может быть два варианта - либо это тоддлеры, либо спаренные размеры
 
         temp_size_divided = sizelong.split('*')  # делим размер на две части , разделитель звездочка
-        left_part_of_size = int(temp_size_divided[0])
-        right_part_of_size = int(temp_size_divided[1])
 
-        if left_part_of_size > right_part_of_size:
-            sizeshort = sizelong[0:t]  # считаем так: если размер типа 92*52 то оставим только 92
-            case = 'TODDLER SIZE'
-        else:
-            sizeshort = sizelong    # а если 14*16 то оставляем без изменений
-            case = 'DOUBLE SIZE'
+        try:
+            left_part_of_size = int(temp_size_divided[0])
+            right_part_of_size = int(temp_size_divided[1])
+
+            if left_part_of_size > right_part_of_size:
+                sizeshort = sizelong[0:t]  # считаем так: если размер типа 92*52 то оставим только 92
+                case = 'TODDLER SIZE'
+            else:
+                sizeshort = sizelong    # а если 14*16 то оставляем без изменений
+                case = 'DOUBLE SIZE'
+        except:
+            case = "OTHER"  # Какойнить странный вариант типа 6*6S и т.д.
+            sizeshort = sizelong
 
     elif sizelong == 'No size':
         sizeshort = 'No size'
@@ -48,9 +53,12 @@ def get_size_short(sizelong):
 
 
 def string_to_decimal(string):
-    if isinstance(string, str):
+    try:
+        # if isinstance(string, str):
         string = string.replace(' ','')
-    return Decimal(string)
+        return Decimal(string)
+    except:
+        return 0
 
 def string_to_integer(string):
     try:
@@ -62,10 +70,13 @@ def string_to_integer(string):
     except:
         return 0
 
+
 def handle_uploaded_file(xlsx_file, user_id):
+
     # -------- Читаем config файл
     seasons_configlist = []
     capsules_configlist = []
+    error_message=''
     seasonname_from_config=''
     capsulename_from_config=''
     try:
@@ -75,16 +86,17 @@ def handle_uploaded_file(xlsx_file, user_id):
         capsules_configlist = config['Capsules']
     except:
         print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
+        return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
 
     # -------- Читаем Эксель файл
     rb = xlrd.open_workbook(file_contents=xlsx_file.read())
     sheet = rb.sheet_by_index(0)
 
-    # def Check if this table is ok
-    #   return False
-
     # -------- Парсим заголовок
     row_header=-1
+    period_from_xls=''
+    col_sku=col_name=col_quantity_sold=col_sellsumm_sold=col_sellprice_sold=col_costsumm_sold=col_costprice_sold = -1
+    col_income=col_quantity_instock=col_costsumm_instock=-1
 
     for rownum in range(sheet.nrows):
         for colnum in range(sheet.ncols):
@@ -109,11 +121,14 @@ def handle_uploaded_file(xlsx_file, user_id):
             if sheet.cell_value(rownum, colnum) == 'Цена розничная, руб. (продажи)':
                 col_sellprice_sold=colnum
 
+
             if sheet.cell_value(rownum, colnum) == 'Сумма себестоимость, руб. (продажи)':
                 col_costsumm_sold = colnum
 
+
             if sheet.cell_value(rownum, colnum) == 'Цена себестоимость, руб. (продажи)':
                 col_costprice_sold=colnum
+
 
             if sheet.cell_value(rownum, colnum) == 'Доход, руб.':
                 col_income=colnum
@@ -124,8 +139,31 @@ def handle_uploaded_file(xlsx_file, user_id):
             if sheet.cell_value(rownum, colnum) == 'Сумма себестоимость, руб. (остатки)':
                 col_costsumm_instock = colnum
 
+
         if row_header != -1 and rownum>row_header:
             break   # чтобы не пробегать весь файл до конца. Все что надо мы уже выяснили.
+
+    if col_sku == -1:
+        return False, "Нет столбца 'Номенклатура.Код'"
+    if col_name == -1:
+        return False, "Нет столбца 'Номенклатура'"
+    if col_quantity_sold == -1:
+        return False, "Нет столбца 'Кол-во (продажи)'"
+    if col_sellsumm_sold == -1:
+        return False, "Нет столбца 'Сумма, руб. (продажи)'"
+    if col_sellprice_sold == -1:
+        return False, "Нет столбца 'Цена розничная, руб. (продажи)'"
+    if col_costsumm_sold == -1:
+        return False, "Нет столбца 'Сумма себестоимость, руб. (продажи)'"
+    if col_costprice_sold == -1:
+        return False, "Нет столбца 'Цена себестоимость, руб. (продажи)'"
+    if col_income == -1:
+        return False, "Нет столбца 'Доход, руб.'"
+    if col_quantity_instock == -1:
+        return False, "Нет столбца 'Кол-во (остатки)'"
+    if col_costsumm_instock == -1:
+        return False, "Нет столбца 'Сумма себестоимость, руб. (остатки)'"
+
 
     # -------- Читаем из файла строки и формируем списки, затем позже сделаем bulk_create
     season_list=[]          # Список моделей , который мы потом запишем
@@ -148,6 +186,60 @@ def handle_uploaded_file(xlsx_file, user_id):
             row+=1
             continue
 
+
+        # Проверим все ли в порядке с цифрами и подготовим их для записи в Size ниже
+
+        cell = sheet.cell_value(row,col_quantity_sold)  # Количество (продажи)
+        if cell:
+            q_s=string_to_integer(cell)
+        else:
+            q_s=0
+
+        cell = sheet.cell_value(row, col_sellsumm_sold) # Сумма (продажи)
+        if cell:
+            ss_s=string_to_decimal(cell)
+        else:
+            ss_s=0
+
+        cell = sheet.cell_value(row, col_costsumm_sold)  # Сумма себестоимость (продажи)
+        if cell:
+            cs_s = string_to_decimal(cell)
+        else:
+            cs_s = 0
+
+        cell = sheet.cell_value(row, col_income)  # Доход
+        if cell:
+            incm = string_to_decimal(cell)
+        else:
+            incm = 0
+
+        cell = sheet.cell_value(row, col_quantity_instock)  # Количество (остатки)
+        if cell:
+            q_i = string_to_integer(cell)
+        else:
+            q_i = 0
+
+        cell = sheet.cell_value(row, col_costsumm_instock)  # Сумма себестоимость (остатки)
+        if cell:
+            cs_i = string_to_decimal(cell)
+        else:
+            cs_i = 0
+
+        # Теперь сама проверка: --------------------
+        if q_s <= 0 or ss_s <=0 or cs_s <=0 : # Если кол-во проданного, сумма и себестоимость <=0,
+            q_s = 0                           # то остальное не имеет смысла. А Доход может быть <=0.
+            ss_s = 0
+            cs_s = 0
+            incm = 0
+
+            if q_i <= 0 or cs_i <=0:    # Если при этом еще и в Instock тоже <=0, то все, пропускаем строку
+                row += 1
+                continue
+
+        if q_i <= 0 or cs_i <=0:
+            q_i = cs_i = 0
+        # Конец проверки ------------------------------
+
         # Разберем прочитанный sku на части
         t = work_cell.find('-')
         if t != -1:
@@ -165,14 +257,7 @@ def handle_uploaded_file(xlsx_file, user_id):
 
         capsule = sku_nosize[:6]    # Капсула - первые 6 символов артикула
 
-        # print('=========================')
-        # print('work_cell=', work_cell)
-        # print('sku_nosize',sku_nosize)
-        # print('sizelong', sizelong)
-        # print('season', season)
-        # print('CAPSULE=', capsule)
-        # print('MEDIA_ROOT', MEDIA_ROOT)
-        # print('STATIC_ROOT', STATIC_ROOT)
+        
         # Добавим Season
         if season not in seasons_checklist:
             seasons_checklist.append(season)
@@ -184,9 +269,6 @@ def handle_uploaded_file(xlsx_file, user_id):
 
             filename = 'images/'+ season+'/'+season + '.jpg'
             image_season = STATIC_URL + filename
-            # print('image_season', image_season)
-            # print('STATIC_ROOT', STATIC_ROOT)
-            # print('STATIC_ROOT+/+filename', STATIC_ROOT+'/'+filename)
 
             if not os.path.isfile(STATIC_ROOT+'/'+filename):
                 image_season = ''
@@ -258,41 +340,41 @@ def handle_uploaded_file(xlsx_file, user_id):
         # Добавим Size
         sku_id = [i.id for i in sku_list if i.sku_firstletters == sku_nosize][0]
 
-        cell = sheet.cell_value(row,col_quantity_sold)  # Количество (продажи)
-        if cell:
-            q_s=string_to_integer(cell)
-        else:
-            q_s=0
-
-        cell = sheet.cell_value(row, col_sellsumm_sold) # Сумма (продажи)
-        if cell:
-            ss_s=string_to_decimal(cell)
-        else:
-            ss_s=0
-
-        cell = sheet.cell_value(row, col_costsumm_sold)  # Сумма себестоимость (продажи)
-        if cell:
-            cs_s = string_to_decimal(cell)
-        else:
-            cs_s = 0
-
-        cell = sheet.cell_value(row, col_income)  # Доход
-        if cell:
-            incm = string_to_decimal(cell)
-        else:
-            incm = 0
-
-        cell = sheet.cell_value(row, col_quantity_instock)  # Количество (остатки)
-        if cell:
-            q_i = string_to_integer(cell)
-        else:
-            q_i = 0
-
-        cell = sheet.cell_value(row, col_costsumm_instock)  # Сумма себестоимость (остатки)
-        if cell:
-            cs_i = string_to_decimal(cell)
-        else:
-            cs_i = 0
+        # cell = sheet.cell_value(row,col_quantity_sold)  # Количество (продажи)
+        # if cell:
+        #     q_s=string_to_integer(cell)
+        # else:
+        #     q_s=0
+        #
+        # cell = sheet.cell_value(row, col_sellsumm_sold) # Сумма (продажи)
+        # if cell:
+        #     ss_s=string_to_decimal(cell)
+        # else:
+        #     ss_s=0
+        #
+        # cell = sheet.cell_value(row, col_costsumm_sold)  # Сумма себестоимость (продажи)
+        # if cell:
+        #     cs_s = string_to_decimal(cell)
+        # else:
+        #     cs_s = 0
+        #
+        # cell = sheet.cell_value(row, col_income)  # Доход
+        # if cell:
+        #     incm = string_to_decimal(cell)
+        # else:
+        #     incm = 0
+        #
+        # cell = sheet.cell_value(row, col_quantity_instock)  # Количество (остатки)
+        # if cell:
+        #     q_i = string_to_integer(cell)
+        # else:
+        #     q_i = 0
+        #
+        # cell = sheet.cell_value(row, col_costsumm_instock)  # Сумма себестоимость (остатки)
+        # if cell:
+        #     cs_i = string_to_decimal(cell)
+        # else:
+        #     cs_i = 0
 
         s_s = get_size_short(sizelong)
 
@@ -330,6 +412,6 @@ def handle_uploaded_file(xlsx_file, user_id):
     SKU.objects.bulk_create(sku_list)
     Size.objects.bulk_create(size_list)
 
-    return True
+    return True, error_message
 
 
