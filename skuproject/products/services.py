@@ -118,16 +118,16 @@ def handle_uploaded_file(xlsx_file, user_id):
             if sheet.cell_value(rownum, colnum) == 'Сумма, руб. (продажи)':
                 col_sellsumm_sold=colnum
 
-            if sheet.cell_value(rownum, colnum) == 'Цена розничная, руб. (продажи)':
-                col_sellprice_sold=colnum
+            # if sheet.cell_value(rownum, colnum) == 'Цена розничная, руб. (продажи)':
+            #     col_sellprice_sold=colnum
 
 
             if sheet.cell_value(rownum, colnum) == 'Сумма себестоимость, руб. (продажи)':
                 col_costsumm_sold = colnum
 
 
-            if sheet.cell_value(rownum, colnum) == 'Цена себестоимость, руб. (продажи)':
-                col_costprice_sold=colnum
+            # if sheet.cell_value(rownum, colnum) == 'Цена себестоимость, руб. (продажи)':
+            #     col_costprice_sold=colnum
 
 
             if sheet.cell_value(rownum, colnum) == 'Доход, руб.':
@@ -151,12 +151,12 @@ def handle_uploaded_file(xlsx_file, user_id):
         return False, "Нет столбца 'Кол-во (продажи)'"
     if col_sellsumm_sold == -1:
         return False, "Нет столбца 'Сумма, руб. (продажи)'"
-    if col_sellprice_sold == -1:
-        return False, "Нет столбца 'Цена розничная, руб. (продажи)'"
+    # if col_sellprice_sold == -1:
+    #     return False, "Нет столбца 'Цена розничная, руб. (продажи)'"
     if col_costsumm_sold == -1:
         return False, "Нет столбца 'Сумма себестоимость, руб. (продажи)'"
-    if col_costprice_sold == -1:
-        return False, "Нет столбца 'Цена себестоимость, руб. (продажи)'"
+    # if col_costprice_sold == -1:
+    #     return False, "Нет столбца 'Цена себестоимость, руб. (продажи)'"
     if col_income == -1:
         return False, "Нет столбца 'Доход, руб.'"
     if col_quantity_instock == -1:
@@ -339,42 +339,6 @@ def handle_uploaded_file(xlsx_file, user_id):
 
         # Добавим Size
         sku_id = [i.id for i in sku_list if i.sku_firstletters == sku_nosize][0]
-
-        # cell = sheet.cell_value(row,col_quantity_sold)  # Количество (продажи)
-        # if cell:
-        #     q_s=string_to_integer(cell)
-        # else:
-        #     q_s=0
-        #
-        # cell = sheet.cell_value(row, col_sellsumm_sold) # Сумма (продажи)
-        # if cell:
-        #     ss_s=string_to_decimal(cell)
-        # else:
-        #     ss_s=0
-        #
-        # cell = sheet.cell_value(row, col_costsumm_sold)  # Сумма себестоимость (продажи)
-        # if cell:
-        #     cs_s = string_to_decimal(cell)
-        # else:
-        #     cs_s = 0
-        #
-        # cell = sheet.cell_value(row, col_income)  # Доход
-        # if cell:
-        #     incm = string_to_decimal(cell)
-        # else:
-        #     incm = 0
-        #
-        # cell = sheet.cell_value(row, col_quantity_instock)  # Количество (остатки)
-        # if cell:
-        #     q_i = string_to_integer(cell)
-        # else:
-        #     q_i = 0
-        #
-        # cell = sheet.cell_value(row, col_costsumm_instock)  # Сумма себестоимость (остатки)
-        # if cell:
-        #     cs_i = string_to_decimal(cell)
-        # else:
-        #     cs_i = 0
 
         s_s = get_size_short(sizelong)
 
