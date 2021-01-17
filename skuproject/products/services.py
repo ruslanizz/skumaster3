@@ -54,7 +54,7 @@ def get_size_short(sizelong):
 
 def string_to_decimal(string):
     try:
-        # if isinstance(string, str):
+        # if isinstance(string, str): # нужно для того, чтобы
         string = string.replace(' ','')
         return Decimal(string)
     except:
@@ -191,36 +191,42 @@ def handle_uploaded_file(xlsx_file, user_id):
 
         cell = sheet.cell_value(row,col_quantity_sold)  # Количество (продажи)
         if cell:
+            cell=str(cell)
             q_s=string_to_integer(cell)
         else:
             q_s=0
 
         cell = sheet.cell_value(row, col_sellsumm_sold) # Сумма (продажи)
         if cell:
+            cell=str(cell)
             ss_s=string_to_decimal(cell)
         else:
             ss_s=0
 
         cell = sheet.cell_value(row, col_costsumm_sold)  # Сумма себестоимость (продажи)
         if cell:
+            cell=str(cell)
             cs_s = string_to_decimal(cell)
         else:
             cs_s = 0
 
         cell = sheet.cell_value(row, col_income)  # Доход
         if cell:
+            cell=str(cell)
             incm = string_to_decimal(cell)
         else:
             incm = 0
 
         cell = sheet.cell_value(row, col_quantity_instock)  # Количество (остатки)
         if cell:
+            cell=str(cell)
             q_i = string_to_integer(cell)
         else:
             q_i = 0
 
         cell = sheet.cell_value(row, col_costsumm_instock)  # Сумма себестоимость (остатки)
         if cell:
+            cell=str(cell)
             cs_i = string_to_decimal(cell)
         else:
             cs_i = 0
@@ -376,6 +382,7 @@ def handle_uploaded_file(xlsx_file, user_id):
     SKU.objects.bulk_create(sku_list)
     Size.objects.bulk_create(size_list)
 
+    # print('SEASON!!!!!', Season.objects.all())
     return True, error_message
 
 
