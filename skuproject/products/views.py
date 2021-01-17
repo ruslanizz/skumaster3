@@ -33,9 +33,8 @@ class SeasonsView(ModelViewSet):
 
 @login_required
 def index_page(request):
-    print('USER:',request.user)
-    print('USER ID:',request.user.id)
-
+    # print('USER:',request.user)
+    # print('USER ID:',request.user.id)
     return render(request,'index.html')
 
 

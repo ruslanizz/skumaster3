@@ -12,9 +12,13 @@
 
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Log In</button>
+  <button type="submit" class="btn btn-primary">Войти</button>
     </div>
 </form>
+    <br>
+<div class="text-center">
+    <a href="/accounts/signup/" role="button" class="btn btn-link">Зарегистрироваться</a>
+</div>
 
 </div>
 </body>

@@ -1,0 +1,15 @@
+{% extends 'index.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block my_content %}
+
+<div class="container-fluid">
+  <h2>Зарегистрируйтесь</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+  </form>
+</div>
+{% endblock %}

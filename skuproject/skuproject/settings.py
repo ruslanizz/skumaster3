@@ -59,7 +59,8 @@ ROOT_URLCONF = 'skuproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [str(BASE_DIR.joinpath('templates'))], # 17 JAN 2021
+        # 'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -148,6 +149,6 @@ REST_FRAMEWORK = {
 }
 
 
-LOGIN_URL = 'accounts/login'
+# LOGIN_URL = 'accounts/login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

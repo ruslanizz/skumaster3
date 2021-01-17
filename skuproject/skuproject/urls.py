@@ -34,6 +34,7 @@ urlpatterns = [
     path('open/', upload_file),
     path('sku/', sku_page),
     path('capsules/', capsules_page),
+    path('accounts/', include('users.urls')), # 17 JAN 2021
     path('accounts/', include('django.contrib.auth.urls'))
 ]
 
