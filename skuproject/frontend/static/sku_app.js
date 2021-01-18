@@ -3,7 +3,8 @@ new Vue({
     data: {
         sortParam: '',
         sku_data: [],
-        checked: false
+        checked: false,
+        checked2: false,
 
            },
 
@@ -54,7 +55,31 @@ new Vue({
 
             } ;
             return newgrid
+        },
+
+
+        it_has_instock: function(full_grid){
+
+            let instock_counter = 0;
+
+            for (let row of full_grid) {
+
+                for (let col of row) {
+                    if (col[1]=='INSTOCK'){
+                        instock_counter +=1;
+                         }
+                };
+            };
+            if (instock_counter > 0) {
+                return true;
+                 }
+             else {
+                return false;
+            };
+
         }
+
+
 
     },
 
