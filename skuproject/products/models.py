@@ -77,6 +77,24 @@ class Capsule(models.Model):
         queryset=Season.objects.filter(user=self.user, id=self.season.id).first()
         return queryset.name
 
+    @property
+    def sold_sizes_dict(self): # For Chart.js
+        sizesdict={}
+        queryset = list(Size.objects.filter(user=self.user, sku__capsule=self.id, quantity_sold__gt=0))
+        for i in queryset:
+
+            if i.size_short not in sizesdict.keys():
+                sizesdict[i.size_short]=i.quantity_sold
+            else:
+                sizesdict[i.size_short]+=i.quantity_sold
+
+        # sizes_for_x_axis = list(sizeslist.keys())     # Кажется есть риск что будет не по порядку!
+        # soldquantity_for_y_axis = list(sizeslist.values())
+
+        # print(sizeslist)
+
+        return sizesdict
+
 
 class SKU(models.Model):
     name = models.CharField(max_length=100, default='', blank=True)

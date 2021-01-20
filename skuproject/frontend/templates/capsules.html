@@ -3,9 +3,10 @@
 {% block my_content %}
 
 {% verbatim %}
+
+
 <div id="capsulesapp">
 
-<!--  <nav style="&#45;&#45;bs-breadcrumb-divider: '>';" aria-label="breadcrumb">-->
   <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <!--           <div v-if="sku_data[0]">-->
@@ -15,14 +16,24 @@
   </ol>
   </nav>
 
+
 <div class="container">
       <div class="row">
     <div class="col">
       <h4>Коллекции</h4>
     </div>
+
     <div class="col">
       <p class="text-end">Для сортировки по параметру - нажмите на него</p>
     </div>
+
+    <div class="col">
+        <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="CheckboxForCharts" v-model="checked">
+        <label class="form-check-label" for="CheckboxForCharts">Показать графики</label>
+        </div>
+    </div>
+
   </div>
 </div>
 
@@ -31,6 +42,7 @@
         <div v-for = "i in sortedCapsulesData">
             <div class="col">
                 <div class="card text-center text-white bg-info" style="width: 18rem;">
+
                     <a :href="'/sku/?capsule=' + i.id">
                     <img class ="card-img-top img-thumbnail" :src="i.img" v-if="i.img" />
                     </a>
@@ -47,7 +59,7 @@
 <!--                        </h5>-->
                         <br>
 
-
+<!--                        {{i.sold_sizes_dict}}-->
 
                         <a v-on:click="sortParam='sku_sellsumm_sold'">
                         Продажи (розн.): {{i.sku_sellsumm_sold | format }} р.
@@ -75,6 +87,13 @@
 <!--                        <br>-->
 
                         </p>
+                        <div class="container-fluid" v-if="i.id == '219-1'">
+                         <div v-if="checked == true">
+                             <sizeschart
+                                      v-bind:sizes_dict="[10,12,15,18,10,12,10,8]"
+                                      width="200" height="70"></sizeschart>
+                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,6 +102,9 @@
     </div>
 </div>
 </div>
+<br>
+
+
 
 {% endverbatim %}
 <script>
