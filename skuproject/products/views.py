@@ -57,15 +57,15 @@ def upload_file(request):
 
 
 def capsules_page(request):
-    sold_sizes_dict={}
-
-    current_season_id=request.get_full_path()
-    pos=current_season_id.find('=')
-    current_season_id=current_season_id[pos+1:] #Из адресной строки взяли текущий season id
-
-    for i in Capsule.objects.filter(user=request.user, season=current_season_id):
-    #     print(request.get_full_path())
-        print(i.name, i.sold_sizes_dict)
+    # sold_sizes_dict={}
+    #
+    # current_season_id=request.get_full_path()
+    # pos=current_season_id.find('=')
+    # current_season_id=current_season_id[pos+1:] #Из адресной строки взяли текущий season id
+    #
+    # for i in Capsule.objects.filter(user=request.user, season=current_season_id):
+    # #     print(request.get_full_path())
+    #     print(i.name, i.sold_sizes_dict)
     return render(request, 'capsules.html')
 
 

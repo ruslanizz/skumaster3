@@ -78,22 +78,30 @@ class Capsule(models.Model):
         return queryset.name
 
     @property
-    def sold_sizes_dict(self): # For Chart.js
-        sizesdict={}
+    def sold_sizes_forchart(self):  # For Chart.js
+        allowed_sizes=['74','80','86','92','98','104','110','116','122','128','134','140','146','152','158','164','170']
+        # Чтобы не было разнобоя в графиках, некрасиво когда разные размеры - и шапки и носки в одном графике
+        sizesdict = {}
+        sizeslist = []
+        quantitylist = []
+        sorted_dict={}
         queryset = list(Size.objects.filter(user=self.user, sku__capsule=self.id, quantity_sold__gt=0))
         for i in queryset:
+            if i.size_short in allowed_sizes:
+                if i.size_short not in sizesdict.keys():
+                    sizesdict[i.size_short] = i.quantity_sold
+                else:
+                    sizesdict[i.size_short] += i.quantity_sold
 
-            if i.size_short not in sizesdict.keys():
-                sizesdict[i.size_short]=i.quantity_sold
-            else:
-                sizesdict[i.size_short]+=i.quantity_sold
+        sorted_dict={x:sizesdict[x] for x in sorted(sizesdict, key=int)}
 
-        # sizes_for_x_axis = list(sizeslist.keys())     # Кажется есть риск что будет не по порядку!
-        # soldquantity_for_y_axis = list(sizeslist.values())
+        for key, value in sorted_dict.items(): # Кажется есть риск что будет не по порядку!
+            sizeslist.append(key)
+            quantitylist.append(value)
 
-        # print(sizeslist)
+        if len(sizeslist)<=1: return [[],[]]
 
-        return sizesdict
+        return [quantitylist, sizeslist]
 
 
 class SKU(models.Model):

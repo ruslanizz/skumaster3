@@ -59,13 +59,13 @@
 <!--                        </h5>-->
                         <br>
 
-<!--                        {{i.sold_sizes_dict}}-->
+
 
                         <a v-on:click="sortParam='sku_sellsumm_sold'">
                         Продажи (розн.): {{i.sku_sellsumm_sold | format }} р.
                         </a>
                         <br>
-                        ------------------------------
+                        ---------------------------
                         <br>
                         <a v-on:click="sortParam='sku_income'">
                         Доход: {{i.sku_income | format }} р.
@@ -76,7 +76,7 @@
                         Наценка: {{i.sku_margin_percent}} %
                         </a>
                         <br>
-                        ------------------------------
+                        ---------------------------
                             <br>
                         <a v-on:click="sortParam='sku_costsumm_instock'">
                         Остатки (закуп.): {{i.sku_costsumm_instock | format }} р.
@@ -85,15 +85,19 @@
                         <br>
 <!--                        Кол-во артикулов: {{i.sku_quantity}}-->
 <!--                        <br>-->
-
                         </p>
-                        <div class="container-fluid" v-if="i.id == '219-1'">
-                         <div v-if="checked == true">
-                             <sizeschart
-                                      v-bind:sizes_dict="[10,12,15,18,10,12,10,8]"
-                                      width="200" height="70"></sizeschart>
+<!--                        <div class="container-fluid" v-if="i.id == '219-1'">-->
+                        <div v-if="checked == true && i.sold_sizes_forchart[0] > []">
+                         <sizeschart
+                                  v-bind:sizes_list="i.sold_sizes_forchart[0]"
+                                  v-bind:labels_list="i.sold_sizes_forchart[1]"
+                                  v-bind:mychartid="i.id"
+                                  width="200" height="70">
+
+                         </sizeschart>
                          </div>
-                        </div>
+<!--                        </div>-->
+
                     </div>
                 </div>
             </div>

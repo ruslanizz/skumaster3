@@ -1,27 +1,28 @@
 Vue.component('sizeschart', {
-  props:['sizes_dict'],
+  props:{'sizes_list': Array,
+         'labels_list': Array,
+         'mychartid': String},
   data: function () {
     return {
       sizesChartData : {
   type: 'line',
+
   data: {
-//    labels: ['122', '128', '134', '140', '146', '152', '158', '164'],
-    datasets: [
-      { // another line graph
+    labels:this.labels_list,
+    datasets:[{
         label: 'Продано',
-//        data: [4.8, 12.1, 12.7, 6.7, 139.8, 116.4, 50.7, 49.2],
-        data: this.sizes_dict,
-        backgroundColor: [
-          'rgba(0, 0,0,0)', // Green
-        ],
-        borderColor: [
-          'rgba(255,255,255,1)',
-        ],
+        data: this.sizes_list,
+        backgroundColor: ['rgba(0, 0,0,0)'],
+        borderColor: ['rgba(255,255,255,1)'],
         borderWidth: 3,
         pointBorderColor :'rgba(255,255,255,1)'
-      }
-    ]
+    }]
+
+
   },
+
+
+
   options: {
     responsive: false,
     animation: {duration: 0},
@@ -31,28 +32,38 @@ Vue.component('sizeschart', {
     scales: {
         xAxes: [{
             type: 'category',
-            labels: ['122', '128', '134', '140', '146', '152', '158', '164'],
             gridLines: {
-              display: false,
+              display: true,
               zeroLineColor: 'rgba(255,255,255,1)',
               color:'rgba(255,255,255,1)',
+              drawBorder: true,
+              drawOnChartArea: false,
+              drawTicks: false,
               zeroLineWidth: 3,
               drawBorder: true,
               },
-            ticks: {fontColor: 'rgba(255,255,255,1)'}
+            ticks: {fontColor: 'rgba(255,255,255,1)',
+                    padding: 5,}
               }],
         yAxes: [{
             gridLines: {
-              display: false,
-              color: 'rgba(219,219,219,0.3)',
-              zeroLineColor: 'rgba(255,255,255,0.7)',
-              drawBorder: false, // <---
-
+              display: true,
+              color: 'rgba(255,255,255,1)',
+              zeroLineColor: 'rgba(255,255,255,1)',
+              drawBorder: true,
+              drawOnChartArea: false,
+              drawTicks: false,
               zeroLineWidth: 1
             },
             ticks: {
-                beginAtZero: true,
-                display: false
+                fontColor: 'rgba(255,255,255,1)',
+                beginAtZero: false,
+                display: true,
+                padding: 5,
+
+                precision: 0,
+//                max:50,
+//                min:0
             }
         }]
     }
@@ -70,28 +81,36 @@ Vue.component('sizeschart', {
     });
   },
 
-  sizes_for_x_axis(){
-  let values=[];
-  for (var key in this.sizes_dict){
-    values.push(key)
-  };
-
-
-    console.log(values);
-    return values
-  }
-
-
-
+//  templatestring: function(){
+//    let mystr='<canvas id="'+this.mychartid+'"></canvas>';
+//
+//    console.log(mystr);
+//    return mystr;
+//  }
 
 
 },
+
+//computed:{
+//  templatestring: function(){
+//    let mystr='<canvas id="'+this.mychartid+'"></canvas>';
+//
+//    console.log(mystr);
+//    return mystr;
+//  }
+//
+//},
+
 mounted() {
-  this.createChart('sizes-chart', this.sizesChartData);
+  this.createChart(this.mychartid, this.sizesChartData);
 },
 
-  template: '<canvas id="sizes-chart"></canvas>'
+//template : '<canvas id="219-1"></canvas>'
+//  template: '<canvas id="' + this.mychartid + '"></canvas>'
+    template: '<canvas v-bind:id="mychartid"></canvas>'
+
 })
+
 
 
 
