@@ -26,12 +26,23 @@ Vue.component('sizeschart', {
   options: {
     responsive: false,
     animation: {duration: 0},
-    layout: {padding: 0},
+    layout: {
+            padding: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0
+            }
+        },
     legend: {
             display: false},
     scales: {
         xAxes: [{
             type: 'category',
+            scaleLabel:{display: false,
+                        labelString: 'Размер',
+                        padding : 2,
+                        fontColor: 'rgba(255,255,255,1)'},
             gridLines: {
               display: true,
               zeroLineColor: 'rgba(255,255,255,1)',
@@ -46,7 +57,11 @@ Vue.component('sizeschart', {
                     padding: 5,}
               }],
         yAxes: [{
-            gridLines: {
+              scaleLabel:{display: false,
+                        labelString: 'Шт.',
+                        padding : 1,
+                        fontColor: 'rgba(255,255,255,1)'},
+              gridLines: {
               display: true,
               color: 'rgba(255,255,255,1)',
               zeroLineColor: 'rgba(255,255,255,1)',

@@ -88,12 +88,12 @@
                         </p>
 
 
-                        <div class="card-footer" v-if="checked == true && i.sold_sizes_forchart[0] > []">
+                        <div class="card-footer px-0 py-0" v-if="checked == true && i.sold_sizes_forchart[0] > []">
                          <sizeschart
                                   v-bind:sizes_list="i.sold_sizes_forchart[0]"
                                   v-bind:labels_list="i.sold_sizes_forchart[1]"
                                   v-bind:mychartid="i.id"
-                                  width="200" height="70">
+                                  width="220" height="70">
 
                          </sizeschart>
                          </div>
