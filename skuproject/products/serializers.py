@@ -13,6 +13,7 @@ class SeasonSerializer(ModelSerializer):
                   'user',
                   'capsules_quantity',
                   'capsules_sellsumm_sold',
+                  'capsules_costsumm_sold',
                   'capsules_income'
                   ]
 
@@ -28,6 +29,7 @@ class CapsuleSerializer(ModelSerializer):
                   'user',
                   'sku_quantity',
                   'sku_sellsumm_sold',
+                  'sku_costsumm_sold',
                   'sku_costsumm_instock',
                   'sku_income',
                   'sku_margin_percent',

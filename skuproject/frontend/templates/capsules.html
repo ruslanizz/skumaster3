@@ -65,6 +65,8 @@
                         Продажи (розн.): {{i.sku_sellsumm_sold | format }} р.
                         </a>
                         <br>
+                        Продажи (закуп.): {{i.sku_costsumm_sold | format }} р.
+                            <br>
                         ---------------------------
                         <br>
                         <a v-on:click="sortParam='sku_income', checked=false">

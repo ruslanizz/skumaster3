@@ -40,7 +40,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="/">Начало - СЕЗОНЫ <span class="sr-only">(current)</span></a>
+<!--        <a class="nav-link" href="/">Начало - СЕЗОНЫ <span class="sr-only">(current)</span></a>-->
       </li>
 
     </ul>
@@ -119,11 +119,13 @@
                 {{i.season_firstletters}}
 
                 <br>
-                Количество капсул: {{i.capsules_quantity}}
-                <br>
+<!--                Количество капсул: {{i.capsules_quantity}}-->
+<!--                <br>-->
                 <a v-on:click="sortParam='capsules_sellsumm_sold'">
-                    Сумма продаж: {{i.capsules_sellsumm_sold | format }} р.
+                    Продажи (розн.): {{i.capsules_sellsumm_sold | format }} р.
                 </a>
+                <br>
+                    Продажи (закуп.): {{i.capsules_costsumm_sold | format }} р.
                 <br>
                 <a v-on:click="sortParam='capsules_income'">
                     Доход: {{i.capsules_income | format }} р.

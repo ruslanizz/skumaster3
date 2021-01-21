@@ -31,6 +31,11 @@ class Season(models.Model):
         return round(summ['sellsumm_sold__sum'])
 
     @property
+    def capsules_costsumm_sold(self):
+        summ = Size.objects.filter(user=self.user, sku__capsule__season=self.id).aggregate(Sum('costsumm_sold'))
+        return round(summ['costsumm_sold__sum'])
+
+    @property
     def capsules_income(self):
         summ = Size.objects.filter(user=self.user, sku__capsule__season=self.id).aggregate(Sum('income'))
         return round(summ['income__sum'])
@@ -55,6 +60,11 @@ class Capsule(models.Model):
     def sku_sellsumm_sold(self):
         summ = Size.objects.filter(user=self.user, sku__capsule=self.id).aggregate(Sum('sellsumm_sold'))
         return round(summ['sellsumm_sold__sum'])
+
+    @property
+    def sku_costsumm_sold(self):
+        summ = Size.objects.filter(user=self.user, sku__capsule=self.id).aggregate(Sum('costsumm_sold'))
+        return round(summ['costsumm_sold__sum'])
 
     @property
     def sku_costsumm_instock(self):
