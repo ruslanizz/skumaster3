@@ -71,9 +71,9 @@
                         Продажи (розн.): {{ i.sizes_sellsumm_sold | format }} р.
                         </a>
                         <br>
-                        ------------------------------
+                           <hr class="border-1 border-white mx-5"/>
 <!--                        Себестоимость: {{ i.sizes_costsumm_sold | format }} р.-->
-                        <br>
+
                         <a v-on:click="sortParam='sizes_income'">
                         Доход: {{ i.sizes_income | format }} р.
                         </a>
@@ -82,8 +82,7 @@
                         Наценка: {{ i.margin_percent }} %
                         </a>
                         <br>
-                        ------------------------------
-                        <br>
+                           <hr class="border-1 border-white mx-5"/>
                         В остатке: {{i.sizes_quantity_instock}} шт.
                         <br>
                         <a v-on:click="sortParam='sizes_costsumm_instock'">

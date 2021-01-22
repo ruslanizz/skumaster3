@@ -14,7 +14,8 @@ class SeasonSerializer(ModelSerializer):
                   'capsules_quantity',
                   'capsules_sellsumm_sold',
                   'capsules_costsumm_sold',
-                  'capsules_income'
+                  'capsules_income',
+                  'capsules_costsumm_instock'
                   ]
 
 
@@ -43,7 +44,11 @@ class UploadedBaseInfoSerializer(ModelSerializer):
         model = UploadedBaseInfo
         fields = ['period',
                   'upload_date',
-                  'user']
+                  'user',
+                  'total_sellsumm_sold',
+                  'total_costsumm_sold',
+                  'total_income',
+                  'total_costsumm_instock']
 
 
 class SkuSerializer(ModelSerializer):

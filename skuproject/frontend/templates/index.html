@@ -92,17 +92,39 @@
 
 </div>
 
+
 <br>
 <div class="alert alert-info" role="alert">
-    <div v-for="j in baseinfo_data">
-        Данные от: {{cleandate}}
-        <br>
-        Период: {{ j.period }}
+<!--    <div class ="container-fluid">-->
+    <div class="row">
 
+            <div class="col">
+                <div v-for="j in baseinfo_data">
+                    Данные от: {{cleandate}}
+                    <br>
+                    Период: {{ j.period }}
+                </div>
+            </div>
+            <div class="col">
+                <div v-for="j in baseinfo_data">
+                    Всего продажи (розн.): {{j.total_sellsumm_sold | format }} р.
+                    <br>
+                    Всего продажи (закуп.): {{j.total_costsumm_sold | format }} р.
+                </div>
+            </div>
+            <div class="col">
+                <div v-for="j in baseinfo_data">
+                    Доход: {{j.total_income | format }} р.
+                    <br>
+                    Остатки (закуп.): {{j.total_costsumm_instock | format }} р.
+                </div>
+            </div>
 
-    </div>
+        </div>
+<!--    </div>-->
 </div>
 <br>
+
 <div class="container-fluid">
     <div class="row">
     <div v-for="i in sortedSeasonData">
@@ -115,22 +137,29 @@
                 <h3 class="card-title">
                     <a :href="'/capsules/?season=' + i.id" class="card-link text-white">{{i.name}}</a>
                 </h3>
-
+                <h5>
+<!--                <span class="badge badge-light text-primary">-->
                 {{i.season_firstletters}}
-
-                <br>
+<!--                </span>-->
+                </h5>
+<!--                <br>-->
 <!--                Количество капсул: {{i.capsules_quantity}}-->
 <!--                <br>-->
+
                 <a v-on:click="sortParam='capsules_sellsumm_sold'">
                     Продажи (розн.): {{i.capsules_sellsumm_sold | format }} р.
                 </a>
+
                 <br>
                     Продажи (закуп.): {{i.capsules_costsumm_sold | format }} р.
                 <br>
+                           <hr class="border-1 border-white mx-5"/>
                 <a v-on:click="sortParam='capsules_income'">
                     Доход: {{i.capsules_income | format }} р.
                 </a>
-<!--                <br>-->
+                <br>
+                           <hr class="border-1 border-white mx-5"/>
+                Остатки (закуп.): {{i.capsules_costsumm_instock | format }} р.
 <!--                USER: {{i.user}}-->
 
             </div>

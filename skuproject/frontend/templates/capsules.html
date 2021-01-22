@@ -66,9 +66,9 @@
                         </a>
                         <br>
                         Продажи (закуп.): {{i.sku_costsumm_sold | format }} р.
-                            <br>
-                        ---------------------------
                         <br>
+                           <hr class="border-1 border-white mx-5"/>
+
                         <a v-on:click="sortParam='sku_income', checked=false">
                         Доход: {{i.sku_income | format }} р.
                         </a>
@@ -77,9 +77,8 @@
                         <a v-on:click="sortParam='sku_margin_percent', checked=false">
                         Наценка: {{i.sku_margin_percent}} %
                         </a>
-                        <br>
-                        ---------------------------
-                            <br>
+                           <hr class="border-1 border-white mx-5"/>
+
                         <a v-on:click="sortParam='sku_costsumm_instock', checked=false">
                         Остатки (закуп.): {{i.sku_costsumm_instock | format }} р.
                         </a>

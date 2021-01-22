@@ -10,6 +10,27 @@ class UploadedBaseInfo(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    @property
+    def total_sellsumm_sold(self):
+        summ = Size.objects.filter(user=self.user).aggregate(Sum('sellsumm_sold'))
+        return round(summ['sellsumm_sold__sum'])
+
+    @property
+    def total_costsumm_sold(self):
+        summ = Size.objects.filter(user=self.user).aggregate(Sum('costsumm_sold'))
+        return round(summ['costsumm_sold__sum'])
+
+    @property
+    def total_income(self):
+        summ = Size.objects.filter(user=self.user).aggregate(Sum('income'))
+        return round(summ['income__sum'])
+
+    @property
+    def total_costsumm_instock(self):
+        summ = Size.objects.filter(user=self.user).aggregate(Sum('costsumm_instock'))
+        return round(summ['costsumm_instock__sum'])
+
+
 
 class Season(models.Model):
     name = models.CharField(max_length=100, default='', blank=True)
@@ -39,6 +60,11 @@ class Season(models.Model):
     def capsules_income(self):
         summ = Size.objects.filter(user=self.user, sku__capsule__season=self.id).aggregate(Sum('income'))
         return round(summ['income__sum'])
+
+    @property
+    def capsules_costsumm_instock(self):
+        summ = Size.objects.filter(user=self.user, sku__capsule__season=self.id).aggregate(Sum('costsumm_instock'))
+        return round(summ['costsumm_instock__sum'])
 
 
 class Capsule(models.Model):
