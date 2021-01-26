@@ -31,6 +31,7 @@ router.register('api/sku', SkuView, basename='sku')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index_page),
+    path('demo/', demo_index_page),
     path('open/', upload_file),
     path('sku/', sku_page),
     path('capsules/', capsules_page),

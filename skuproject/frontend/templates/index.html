@@ -59,7 +59,9 @@
   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
 
     <a class="dropdown-item" href="/accounts/login">Войти/Сменить пользователя</a>
+    {% if request.user.is_superuser %}
     <a class="dropdown-item" href="/admin">Панель администратора</a>
+    {% endif %}
     <div class="dropdown-divider"></div>
     <a class="dropdown-item" href="/accounts/logout">Выйти</a>
 
@@ -75,24 +77,28 @@
 
 {% block my_content %}
 
-{% verbatim %}
 
-<div  id="seasonsapp">
 <br>
 <div class="container">
     <div class="row">
         <div class="col text-left">
-            <h4>Сезоны</h4>
+            <h4 class="text-primary">Сезоны</h4>
         </div>
+    {% if request.user.email != "test@test.com" %}
         <div class="col text-left">
             <a href="/open" role="button" class="btn btn-primary">Загрузить новые данные</a>
         </div>
-
+    {% else %}
+        <div class="col text-left">
+            <a href="/open" role="button" class="btn btn-primary disabled" aria-disabled="true">Загрузить новые данные</a>
+        </div>
+    {% endif %}
     </div>
 
 </div>
 
-
+{% verbatim %}
+<div  id="seasonsapp">
 <br>
 <div class="alert alert-info" role="alert">
 <!--    <div class ="container-fluid">-->
@@ -158,6 +164,7 @@
                     Доход: {{i.capsules_income | format }} р.
                 </a>
                 <br>
+                Наценка: {{i.capsules_margin_percent}} %
                            <hr class="border-1 border-white mx-5"/>
                 Остатки (закуп.): {{i.capsules_costsumm_instock | format }} р.
 <!--                USER: {{i.user}}-->

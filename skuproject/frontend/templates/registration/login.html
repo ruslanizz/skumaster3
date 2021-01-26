@@ -4,21 +4,31 @@
 <br>
 <br>
 <div class="container-fluid">
-<h2 class="text-center">Войдите</h2>
-<br><br>
+    <div class="row align-items-center">
+        <div class="col text-center text-dark">
+        <h2 class="text-center">Войдите</h2>
+        <br><br>
 
-<form method="post">
-    <div class="form-group text-center">
+        <form method="post">
+            <div class="form-group text-center">
 
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-primary">Войти</button>
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Войти</button>
+            </div>
+        </form>
+            <br>
+        <div class="text-center">
+            <a href="/accounts/signup/" role="button" class="btn btn-link">Зарегистрироваться</a>
+            <a href="/demo" role="button" class="btn btn-link">Войти с демо-доступом</a>
+        </div>
+        </div>
+        <div class="col text-center">
+            <H1 class="text-primary">SKU master</H1>
+            <p class="text-secondary">Делает удобнее работу с заказом и подсортировкой коллекции</p>
+
+        </div>
     </div>
-</form>
-    <br>
-<div class="text-center">
-    <a href="/accounts/signup/" role="button" class="btn btn-link">Зарегистрироваться</a>
-</div>
 
 </div>
 </body>

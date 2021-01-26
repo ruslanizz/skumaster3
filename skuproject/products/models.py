@@ -66,6 +66,12 @@ class Season(models.Model):
         summ = Size.objects.filter(user=self.user, sku__capsule__season=self.id).aggregate(Sum('costsumm_instock'))
         return round(summ['costsumm_instock__sum'])
 
+    @property
+    def capsules_margin_percent(self):
+        if (self.capsules_sellsumm_sold - self.capsules_income) == 0:
+            return 0
+        return round(((self.capsules_sellsumm_sold / (self.capsules_sellsumm_sold - self.capsules_income)) * 100) - 100)
+
 
 class Capsule(models.Model):
     capsule_firstletters = models.CharField(max_length=30, default='', blank=False)

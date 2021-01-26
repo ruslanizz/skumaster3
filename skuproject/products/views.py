@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -31,6 +32,15 @@ class SeasonsView(ModelViewSet):
         return query_set
 
 
+def demo_index_page(request):
+    # if request.method == 'POST':
+
+    demo_user = authenticate(username='test@test.com',
+                                    password='Sosiska25',
+                                    )
+    login(request, demo_user)
+    return render(request,'index.html')
+
 @login_required
 def index_page(request):
     # print('USER:',request.user)
@@ -57,15 +67,7 @@ def upload_file(request):
 
 
 def capsules_page(request):
-    # sold_sizes_dict={}
-    #
-    # current_season_id=request.get_full_path()
-    # pos=current_season_id.find('=')
-    # current_season_id=current_season_id[pos+1:] #Из адресной строки взяли текущий season id
-    #
-    # for i in Capsule.objects.filter(user=request.user, season=current_season_id):
-    # #     print(request.get_full_path())
-    #     print(i.name, i.sold_sizes_dict)
+
     return render(request, 'capsules.html')
 
 

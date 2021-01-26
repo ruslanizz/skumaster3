@@ -15,7 +15,8 @@ class SeasonSerializer(ModelSerializer):
                   'capsules_sellsumm_sold',
                   'capsules_costsumm_sold',
                   'capsules_income',
-                  'capsules_costsumm_instock'
+                  'capsules_costsumm_instock',
+                  'capsules_margin_percent'
                   ]
 
 
