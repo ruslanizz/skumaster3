@@ -11,10 +11,30 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.js" integrity="sha512-nqIFZC8560+CqHgXKez61MI0f9XSTKLkm0zFVm/99Wt0jSTZ7yeeYwbzyl0SGn/s8Mulbdw+ScCG41hmO2+FKw==" crossorigin="anonymous"></script>
 
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />-->
 <style>
     a:hover{cursor:pointer;}
 </style>
+
+
+<style>
+/* Animation */
+      .zoom {
+<!--        transition: transform .2s; -->
+<!--            z-index: 1;-->
+      }
+
+      .zoom:hover {
+        transform: scale(3.5);
+        transform-origin: top left;
+        position: relative; /* используется вместе с z-index */
+        z-index: 10;
+
+
+      }
+</style>
+
 
 <!--Перезапишем размер Бутстрапа на меньший-->
 <!--Так как fixed-top navbar - он перекрывает все под ним, поэтому ставим padding-top -->
@@ -79,10 +99,10 @@
 
 
 <br>
-<div class="container">
+<div class="container ">
     <div class="row">
         <div class="col text-left">
-            <h4 class="text-primary">Сезоны</h4>
+            <h4 class="text-primary">СЕЗОНЫ</h4>
         </div>
     {% if request.user.email != "test@test.com" %}
         <div class="col text-left">
@@ -132,7 +152,7 @@
 <br>
 
 <div class="container-fluid">
-    <div class="row">
+    <div class="row justify-content-center">
     <div v-for="i in sortedSeasonData">
         <div class="col">
         <div class="card text-center text-white bg-primary" style="width: 18rem;">

@@ -3,6 +3,9 @@
 {% block my_content %}
 
 {% verbatim %}
+
+
+
 <div id="skuapp">
 
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
@@ -23,10 +26,11 @@
 <div class="container">
       <div class="row">
     <div class="col">
-      <h4>Артикулы</h4>
+      <h4>АРТИКУЛЫ</h4>
     </div>
     <div class="col">
       <p class="text-end">Для сортировки по параметру - нажмите на него</p>
+
     </div>
     <div class="col">
         <div class="form-check form-check-inline">
@@ -55,16 +59,33 @@
 
                 <div class="card text-center text-white bg-info" style="width: 19rem;">
 
-                        <img class ="card-img-top img-thumbnail" :src="i.img"  v-if="i.img" />
+
+                    <div class="row no-gutters mt-2">
+                        <div class="col-md-4">
+
+                            <img class ="card-img-top img-thumbnail zoom"
+                                style="width:5rem;" :src="i.img"  v-if="i.img" />
+
+                        </div>
+
+                        <div class="col-md-8">
+                            <a v-on:click="sortParam='sku_firstletters'">
+                            <h4 class="card-title">{{i.sku_firstletters}}</h4>
+                            </a>
+                             <h5>{{i.name}}</h5>
+                        </div>
+                    </div>
+
+
 
                     <div class="card-body">
 
-                        <a v-on:click="sortParam='sku_firstletters'">
-                        <h3 class="card-title">{{i.sku_firstletters}}</h3>
-                        </a>
+<!--                        <a v-on:click="sortParam='sku_firstletters'">-->
+<!--                        <h3 class="card-title">{{i.sku_firstletters}}</h3>-->
+<!--                        </a>-->
                         <p class="card-text">
-                        <h5>{{i.name}}</h5>
-                        <br>
+<!--                        <h5>{{i.name}}</h5>-->
+<!--                        <br>-->
                         Продано: {{i.sizes_quantity_sold}} шт.
                         <br>
                         <a v-on:click="sortParam='sizes_sellsumm_sold'">
@@ -91,6 +112,18 @@
                         <br>
 
                         </p>
+
+
+<!--                Прикольно!! Прогресс бар для продано/остаток        -->
+<!--                <div class="progress mt-1 mb-0" style="height: 7px;">-->
+<!--                <div class="progress-bar bg-primary" role="progressbar" style="width: 80%"-->
+<!--                     aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>-->
+<!--                </div>-->
+
+
+
+
+
 
 <!--                        Размеры-->
 
