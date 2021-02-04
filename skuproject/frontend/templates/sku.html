@@ -6,9 +6,9 @@
 
 
 
-<div id="skuapp">
+<div v-cloak id="skuapp">
 
-  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <nav aria-label="breadcrumb" style="font-size: 1.2rem;">
   <ol class="breadcrumb">
 
     <li class="breadcrumb-item" v-if="sku_data[0]"><a href="/">Сезон: {{sku_data[0]["get_season_name"]}}</a></li>
@@ -20,18 +20,22 @@
 
 
 
-
-
-
-<div class="container">
-      <div class="row">
+<div class="container-fluid mx-0 ">
+      <div class="row align-items-start">
+<!--    <div class="col">-->
+<!--      <h4>АРТИКУЛЫ</h4>-->
+<!--    </div>-->
     <div class="col">
-      <h4>АРТИКУЛЫ</h4>
-    </div>
-    <div class="col">
-      <p class="text-end">Для сортировки по параметру - нажмите на него</p>
+      <p>Для сортировки по параметру - нажмите на него</p>
 
     </div>
+
+    <div class="col">
+<span class="badge badge-primary">98</span> - размер в наличии <br>
+<span class="badge badge-sold">98</span> - размер продан
+
+    </div>
+
     <div class="col">
         <div class="form-check form-check-inline">
         <input class="form-check-input" type="checkbox" id="CheckboxForSoldSizes" v-model="checked">
@@ -52,12 +56,13 @@
 <!--{{sku_data[0]["name"]}}-->
 <!--img    style="width:200px; display:block; margin-left: auto; margin-right: auto;"-->
 
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid grey-bg py-2">
+    <div class="row justify-content-center">
         <div v-for = "i in sortedSkuData">
             <div class="col" v-if="checked2==false || it_has_instock(i.sizes_grid) == true">
 
-                <div class="card text-center text-white bg-info" style="width: 19rem;">
+                <!--                text-white bg-info-->
+                <div class="card text-center bg-white text-secondary" style="width: 19rem;">
 
 
                     <div class="row no-gutters mt-2">
@@ -68,7 +73,7 @@
 
                         </div>
 
-                        <div class="col-md-8">
+                        <div class="col-md-8  text-dark">
                             <a v-on:click="sortParam='sku_firstletters'">
                             <h4 class="card-title">{{i.sku_firstletters}}</h4>
                             </a>
@@ -78,40 +83,110 @@
 
 
 
-                    <div class="card-body">
+                    <div class="card-body pt-1">
+<!--                        <p class="card-text">-->
 
-<!--                        <a v-on:click="sortParam='sku_firstletters'">-->
-<!--                        <h3 class="card-title">{{i.sku_firstletters}}</h3>-->
-<!--                        </a>-->
-                        <p class="card-text">
-<!--                        <h5>{{i.name}}</h5>-->
-<!--                        <br>-->
-                        Продано: {{i.sizes_quantity_sold}} шт.
-                        <br>
-                        <a v-on:click="sortParam='sizes_sellsumm_sold'">
-                        Продажи (розн.): {{ i.sizes_sellsumm_sold | format }} р.
-                        </a>
-                        <br>
-                           <hr class="border-1 border-white mx-5"/>
+
+
+                        <div class="row no-gutters align-items-center">
+                            <div class="col">
+                               <a v-on:click="sortParam='sizes_sellsumm_sold'">
+                                Продажи (р.ц.):
+                               </a>
+                            </div>
+                            <div class="col">
+                                <a v-on:click="sortParam='sizes_sellsumm_sold'">
+                                <h4>{{ i.sizes_sellsumm_sold | format }} р.</h4>
+                                </a>
+                            </div>
+                        </div>
+
+
+                        <div class="row no-gutters align-items-center">
+                            <div class="col">
+                               <a v-on:click="sortParam='sizes_costsumm_instock'">
+                                Остатки (з.ц.):
+                               </a>
+                            </div>
+                            <div class="col">
+                                <a v-on:click="sortParam='sizes_costsumm_instock'">
+                                {{ i.sizes_costsumm_instock | format }} р.
+                                </a>
+                            </div>
+                        </div>
+
+
+                        <hr class="border-1 border-secondary mx-5"/>
+
+                        <div class="row no-gutters align-items-center">
+                            <div class="col">
+                               <a v-on:click="sortParam='margin_percent'">
+                                Наценка:
+                               </a>
+                            </div>
+                            <div class="col">
+                                <a v-on:click="sortParam='margin_percent'">
+                                    <h4>{{ i.margin_percent }} %</h4>
+                                </a>
+                            </div>
+                        </div>
+
+
+                        <div class="row no-gutters align-items-center">
+                            <div class="col">
+                               <a v-on:click="sortParam='sizes_income'">
+                                Доход:
+                               </a>
+                            </div>
+                            <div class="col">
+                                <a v-on:click="sortParam='sizes_income'">
+                                    {{ i.sizes_income | format }} р.
+                                </a>
+                            </div>
+                        </div>
+
+
+
+
 <!--                        Себестоимость: {{ i.sizes_costsumm_sold | format }} р.-->
 
-                        <a v-on:click="sortParam='sizes_income'">
-                        Доход: {{ i.sizes_income | format }} р.
-                        </a>
-                        <br>
-                        <a v-on:click="sortParam='margin_percent'">
-                        Наценка: {{ i.margin_percent }} %
-                        </a>
-                        <br>
-                           <hr class="border-1 border-white mx-5"/>
-                        В остатке: {{i.sizes_quantity_instock}} шт.
-                        <br>
-                        <a v-on:click="sortParam='sizes_costsumm_instock'">
-                        Себестоимость: {{ i.sizes_costsumm_instock | format }} р.
-                        </a>
-                        <br>
 
-                        </p>
+                           <hr class="border-1 border-secondary mx-5"/>
+
+
+
+                        <div class="row no-gutters">
+                            <div class="col">
+                                Продано
+                            </div>
+                            <div class="col">
+                                В остатке
+                            </div>
+                        </div>
+
+                        <div class="row no-gutters">
+                            <div class="col">
+                                {{i.sizes_quantity_sold}} шт.
+                            </div>
+                            <div class="col">
+                                {{i.sizes_quantity_instock}} шт.
+                            </div>
+                        </div>
+
+<!--                        Сделать checkbox "Показать закупочные цены"-->
+<!--                        <div class="row no-gutters">-->
+<!--                            <div class="col">-->
+<!--                                {{ i.sizes_costsumm_sold | format }} р. (з.ц.)-->
+<!--                            </div>-->
+<!--                            <div class="col">-->
+<!--                                 <a v-on:click="sortParam='sizes_costsumm_instock'">-->
+<!--                                    {{ i.sizes_costsumm_instock | format }} р.(з.ц.)-->
+<!--                                </a>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+
+<!--                        </p>-->
 
 
 <!--                Прикольно!! Прогресс бар для продано/остаток        -->
@@ -127,7 +202,7 @@
 
 <!--                        Размеры-->
 
-<!--                        <div class="card-footer">-->
+<!--                        <div class="card-footer bg-white">-->
 
                         <div class="container-fluid" v-if="checked === false">
 
@@ -137,7 +212,7 @@
 
                                     <div v-if="column[1]==='INSTOCK'">
                                         <p class="fs-6">
-                                        <span class="badge badge-warning">
+                                        <span class="badge badge-primary">
                                             {{size_fit_to_column(r, column[0])}}
                                         </span>
                                         </p>
@@ -145,7 +220,7 @@
 
                                     <div v-if="column[1]==='SOLD'">
                                         <p class="fs-6">
-                                        <span class="badge badge-secondary">
+                                        <span class="badge badge-sold">
                                              {{size_fit_to_column(r, column[0])}}
                                         </span>
                                         </p>
@@ -164,7 +239,7 @@
 
                                             <div v-if="column[1]==='INSTOCK'">
                                                 <p class="fs-6">
-                                                <span class="badge badge-warning">
+                                                <span class="badge badge-primary">
 <!--                                                    {{column[0]}}-->
                                                     {{size_fit_to_column(r, column[0])}}
                                                 </span>
@@ -175,7 +250,7 @@
 
                             </div>
                         </div>
-
+<!--                        </div>-->
 
                     </div>
                 </div>
@@ -201,6 +276,9 @@
     const capsule_number = urlParams.get('capsule')
 
 </script>
+
+
+
 <script src="/static/sku_app.js"></script>
 </body>
 </html>

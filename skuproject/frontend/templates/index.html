@@ -15,13 +15,18 @@
 <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />-->
 <style>
     a:hover{cursor:pointer;}
+
+    [v-cloak] {display: none;}  /* Чтобы не показывались фигурные скобки пока медленно загружается страница */
+
+    .badge-sold {background-color: lightsteelblue;
+                color: white;}
 </style>
 
 
 <style>
 /* Animation */
       .zoom {
-<!--        transition: transform .2s; -->
+<!--        transition: transform .2s;-->
 <!--            z-index: 1;-->
       }
 
@@ -33,6 +38,9 @@
 
 
       }
+
+      .grey-bg {background-color: #F5F7FA;}
+
 </style>
 
 
@@ -99,7 +107,7 @@
 
 
 <br>
-<div class="container ">
+<div class="container mx-0">
     <div class="row">
         <div class="col text-left">
             <h4 class="text-primary">СЕЗОНЫ</h4>
@@ -118,7 +126,7 @@
 </div>
 
 {% verbatim %}
-<div  id="seasonsapp">
+<div v-cloak id="seasonsapp">
 <br>
 <div class="alert alert-info" role="alert">
 <!--    <div class ="container-fluid">-->
@@ -126,9 +134,9 @@
 
             <div class="col">
                 <div v-for="j in baseinfo_data">
-                    Данные от: {{cleandate}}
-                    <br>
-                    Период: {{ j.period }}
+<!--                    Данные от: {{cleandate}}-->
+<!--                    <br>-->
+                    Период: <h5>{{ j.period }}</h5>
                 </div>
             </div>
             <div class="col">
@@ -197,6 +205,17 @@
     </div>
 
 </div>
+
+    <br>
+    <br>
+
+    <nav class="navbar sticky-bottom navbar-light bg-light">
+<!--        <a class="navbar-brand" href="mailto:ruslanizz@yandex.ru">(c) Руслан Валиуллин </a>-->
+        Данные загружены: {{cleandate}}
+    </nav>
+
+
+
 </div>
 
 
