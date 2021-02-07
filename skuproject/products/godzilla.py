@@ -37,7 +37,7 @@ def build_sizes_grid(newsizes):
     # print('newsizes',newsizes)
 
     # print('SORTED', keys_list)
-    # Где то здесь надо будет сделать сортировку по размерам! Предусмотреть что размер может быть не int, а string
+
     final_list=[]
 
     newsizes_copy = newsizes

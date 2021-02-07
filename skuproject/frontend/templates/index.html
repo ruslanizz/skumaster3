@@ -73,13 +73,14 @@
 
     </ul>
 
+<a class="btn btn-primary" role="button" href="/onway">
+      <i class="bi bi-truck" style="font-size: 1.2rem;"></i>
+          Товар в пути
+</a>
+
   <div class="dropdown">
   <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 0 0 8 15a6.987 6.987 0 0 0 5.468-2.63z"/>
-                <path fill-rule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                <path fill-rule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
-                </svg>
+      <i class="bi bi-person-circle" style="font-size: 1.2rem;"></i>
       {% if user.is_authenticated %}
                 {{request.user}}
       {% endif %}
@@ -114,7 +115,10 @@
         </div>
     {% if request.user.email != "test@test.com" %}
         <div class="col text-left">
-            <a href="/open" role="button" class="btn btn-primary">Загрузить новые данные</a>
+            <a href="/open" role="button" class="btn btn-primary">
+               <i class="bi bi-upload" style="font-size: 1rem;"></i>
+                 &nbsp Загрузить новые данные
+            </a>
         </div>
     {% else %}
         <div class="col text-left">

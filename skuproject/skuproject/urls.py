@@ -33,6 +33,7 @@ urlpatterns = [
     path('', index_page),
     path('demo/', demo_index_page),
     path('open/', upload_file),
+    path('onway/', onway_page),
     path('sku/', sku_page),
     path('capsules/', capsules_page),
     path('accounts/', include('users.urls')), # 17 JAN 2021

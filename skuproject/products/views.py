@@ -7,7 +7,7 @@ from products.models import UploadedBaseInfo, Season, Capsule, SKU
 from rest_framework.viewsets import ModelViewSet
 
 from products.serializers import UploadedBaseInfoSerializer, SeasonSerializer, CapsuleSerializer, SkuSerializer
-from products.services import handle_uploaded_file
+from products.services import handle_uploaded_file, upload_onway_bill
 
 
 class UploadedBaseInfoView(ModelViewSet):
@@ -105,3 +105,21 @@ class CapsulesView(ModelViewSet):
         if param is not None:
             query_set = query_set.filter(season=param, user=self.request.user)
         return query_set
+
+
+def onway_page(request):
+    successfully_loaded = False
+    if request.method == 'POST' and request.FILES.get('xlsx_file'):
+
+        uploaded_xlsx_file = request.FILES['xlsx_file']
+        print('Эксель файл загружен:')
+        print('Файл:', uploaded_xlsx_file.name)
+        print('Размер файла:', uploaded_xlsx_file.size)
+        print('--------------------------')
+        successfully_loaded, error_message = upload_onway_bill(uploaded_xlsx_file, request.user)
+        if successfully_loaded:
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'onway.html', {'message': error_message})
+
+    return render(request, 'onway.html')
