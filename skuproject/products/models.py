@@ -199,7 +199,8 @@ class SKU(models.Model):
         grid={}
 
         for i in queryset:
-            grid[i.size_short]=[i.quantity_instock, i.quantity_sold]
+            # grid[i.size_short]=[i.quantity_instock, i.quantity_sold]
+            grid[i.size_short]=[i.quantity_instock, i.quantity_sold, i.quantity_onway]
 
         result = build_sizes_grid(grid)
 
@@ -228,8 +229,8 @@ class Size(models.Model):
     sku_full = models.CharField(max_length=100, default='', blank=False)
     sku = models.ForeignKey(SKU, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Артикул')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    # quantity_onway = models.IntegerField(default=0)
-    # costsumm_onway = models.DecimalField(default=0, max_digits=11, decimal_places=2, blank=True)
+    quantity_onway = models.IntegerField(default=0, blank=True)
+    costsumm_onway = models.DecimalField(default=0, max_digits=11, decimal_places=2, blank=True)
 
     def __str__(self):
         return self.sku_full

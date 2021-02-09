@@ -32,7 +32,9 @@
 
     <div class="col">
 <span class="badge badge-primary">98</span> - размер в наличии <br>
-<span class="badge badge-sold">98</span> - размер продан
+<span class="badge badge-sold">98</span> - размер продан<br>
+<span class="badge badge-warning">98</span> - размер в пути<br>
+
 
     </div>
 
@@ -225,6 +227,16 @@
                                         </span>
                                         </p>
                                     </div>
+
+                                    <div v-if="column[1]==='ONWAY'">
+                                        <p class="fs-6">
+                                        <span class="badge badge-warning">
+                                             {{size_fit_to_column(r, column[0])}}
+                                        </span>
+                                        </p>
+                                    </div>
+
+
 
                                 </div>
 
