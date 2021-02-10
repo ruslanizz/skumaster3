@@ -73,10 +73,10 @@
 
     </ul>
 
-<a class="btn btn-primary" role="button" href="/onway">
-      <i class="bi bi-truck" style="font-size: 1.2rem;"></i>
-          Товар в пути
-</a>
+<!--<a class="btn btn-primary" role="button" href="/onway">-->
+<!--      <i class="bi bi-truck" style="font-size: 1.2rem;"></i>-->
+<!--          Товар в пути-->
+<!--</a>-->
 
   <div class="dropdown">
   <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -111,7 +111,7 @@
 <div class="container mx-0">
     <div class="row">
         <div class="col text-left">
-            <h4 class="text-primary">СЕЗОНЫ</h4>
+            <h4 class="text-dark">СЕЗОНЫ</h4>
         </div>
     {% if request.user.email != "test@test.com" %}
         <div class="col text-left">
@@ -125,6 +125,14 @@
             <a href="/open" role="button" class="btn btn-primary disabled" aria-disabled="true">Загрузить новые данные</a>
         </div>
     {% endif %}
+
+     <div class="col tex-left">
+         <a  href="/onway">
+          <i class="bi bi-truck" style="font-size: 1.2rem;"></i>
+             Загрузить товар в пути
+         </a>
+     </div>
+
     </div>
 
 </div>
