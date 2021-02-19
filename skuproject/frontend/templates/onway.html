@@ -5,100 +5,82 @@
 {% load static %}
 <div class="jumbotron">
   <h1 class="display-4">Загрузка товара в пути</h1>
-  <p class="lead">Товар, который еще не загружен в 1С, но находится на пути к вам. <br>
+  <p class="lead">
+      Товар, который еще не загружен в 1С, но находится на пути к вам. <br>
       Это нужно когда уже заказываешь новую партию товара, еще не приняв ту, которая находится в пути.<br>
-    Просто загружаем счет от поставщика в формате .xlsx <br>
+        Просто загружаем счет от поставщика в формате .xlsx <br>
   </p>
 
-      <button type="button" class="btn btn-link" data-toggle="modal" data-target="#MyModal">
-          Как выглядит счет
-      </button>
+  <button type="button" class="btn btn-link" data-toggle="modal" data-target="#MyModal">
+      Как выглядит счет
+  </button>
 
     <!-- Modal -->
-<div class="modal fade" id="MyModal" tabindex="-1" aria-labelledby="MyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="MyModalLabel">Как выглядит счет</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Загрузите обычный счет от поставщика в формате ".xlsx".<br>
-        Обязательны столбцы с названиями:<br>
-          Артикул <br>
-          Товары (работы, услуги)<br>
-          Кол-во<br>
-          Сумма <br><br>
+    <div class="modal fade" id="MyModal" tabindex="-1" aria-labelledby="MyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="MyModalLabel">Как выглядит счет</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Загрузите обычный счет от поставщика в формате ".xlsx".<br>
+                    Обязательны столбцы с названиями:<br>
+                    Артикул <br>
+                    Товары (работы, услуги)<br>
+                    Кол-во<br>
+                    Сумма <br><br>
 
-          Эти размеры на странице Артикулы будут отображаться желтым цветом.<br>
-          Так как это временная мера, при следующей загрузке данных - товар в пути будет удален из базы.<br>
-           <br>
-          <br>
-
-        <a href="{% static 'images/bill_example.jpg' %}" target="_blank">Пример счета - фото</a>
-                 &emsp;
-
-
-
-      </div>
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Понятно</button>
-      </div>
+                    Эти размеры на странице Артикулы будут отображаться желтым цветом.<br>
+                    Так как это временная мера, при следующей загрузке данных - товар в пути будет удален из базы.<br>
+                    <br><br>
+                    <a href="{% static 'images/bill_example.jpg' %}" target="_blank">Пример счета - фото</a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Понятно</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 
-  <hr class="my-4">
+    <hr class="my-4">
 
     {% if message %}
-
-    <div class="alert alert-warning" role="alert">
-        Вы точно правильную таблицу загружаете? {{message}} !
-    </div>
+        <div class="alert alert-warning" role="alert">
+            Вы точно правильную таблицу загружаете? {{message}} !
+        </div>
     {%endif%}
-<div class = "container">
-    <br>
-    <h3> ЗАГРУЗИТЕ ФАЙЛ XLSX :</h3>
-    <form enctype="multipart/form-data" method="POST">
-    {% csrf_token %}
-{% verbatim %}
-    <div class="custom-file">
-        <input type="file" name = "xlsx_file" accept=".xlsx" class="custom-file-input" id="myFile">
-        <label class="custom-file-label" for="myFile">Выберите файл XLSX</label>
+
+    <div class = "container">
+        <br>
+        <h3> ЗАГРУЗИТЕ ФАЙЛ XLSX :</h3>
+        <form enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+
+            {% verbatim %}
+            <div class="custom-file">
+                <input type="file" name = "xlsx_file" accept=".xlsx" class="custom-file-input" id="myFile">
+                <label class="custom-file-label" for="myFile">Выберите файл XLSX</label>
+            </div>
+            <br><br>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+            {% endverbatim %}
+        </form>
+
+        <script>
+            // Add the following code if you want the name of the file appear on select
+            $(".custom-file-input").on("change", function() {
+              var fileName = $(this).val().split("\\").pop();
+              $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+        </script>
     </div>
-
-    <br>
-    <br>
-         <button type="submit" class="btn btn-primary">Отправить</button>
-
-{% endverbatim %}
-
-    </form>
-
-
-
-<script>
-// Add the following code if you want the name of the file appear on select
-$(".custom-file-input").on("change", function() {
-  var fileName = $(this).val().split("\\").pop();
-  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-});
-</script>
-</div>
-    <br>
-    <br>
+    <br><br>
 
 </div>
-<br>
-
-
-
-<br>
-<br>
-
+<br><br><br>
 
 {% endblock %}

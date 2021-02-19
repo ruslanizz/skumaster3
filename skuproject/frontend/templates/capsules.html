@@ -41,7 +41,7 @@
     <div class="row justify-content-center">
         <div v-for = "i in sortedCapsulesData">
             <div class="col">
-                <div class="card text-center text-white bg-info" style="width: 18rem;">
+                <div class="card text-center text-white bg-info mx-0 px-0" style="width: 18rem;">
 
                     <a :href="'/sku/?capsule=' + i.id">
                     <img class ="card-img-top img-thumbnail" :src="i.img" v-if="i.img" />
@@ -58,34 +58,106 @@
                         </a>
 <!--                        </h5>-->
                         <br>
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
 
+                            </div>
 
+                            <div class="col-sm-6 text-left px-2">
 
-                        <a v-on:click="sortParam='sku_sellsumm_sold', checked=false">
-                        Продажи (розн.): {{i.sku_sellsumm_sold | format }} р.
-                        </a>
-                        <br>
-                        Продажи (закуп.): {{i.sku_costsumm_sold | format }} р.
-                        <br>
+                                <a v-on:click="sortParam='sku_sellsumm_sold', checked=false">
+                                Продажи(р.ц.)
+                                </a>
+                            </div>
+
+                            <div class="col text-left">
+                                {{i.sku_sellsumm_sold | format }} р.
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
+
+                            </div>
+
+                            <div class="col-sm-6 text-left px-2">
+                                Продажи(з.ц.)
+                            </div>
+
+                            <div class="col text-left">
+                                {{i.sku_costsumm_sold | format }} р.
+                            </div>
+                        </div>
+
                            <hr class="border-1 border-white mx-5"/>
 
-                        <a v-on:click="sortParam='sku_income', checked=false">
-                        Доход: {{i.sku_income | format }} р.
-                        </a>
-                        <br>
+                        <div class="row">
+                            <div class="col-sm-1 text-left px-0">
+                                <span class="badge badge-warning" style="font-size: 8px;">
+                                <i class="bi bi-lightning-fill"></i>
+                                1
+                                </span>
+                            </div>
 
-                        <a v-on:click="sortParam='sku_margin_percent', checked=false">
-                        Наценка: {{i.sku_margin_percent}} %
-                        </a>
+                            <div class="col-sm-6 text-left px-2">
+                                <a v-on:click="sortParam='sku_income', checked=false">
+                                Доход:
+                                </a>
+                            </div>
+                            <div class="col text-left">
+                                {{i.sku_income | format }} р.
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
+
+                            </div>
+
+                            <div class="col-sm-6 text-left px-2">
+                                <a v-on:click="sortParam='sku_margin_percent', checked=false">
+                                Наценка
+                                </a>
+                            </div>
+
+                            <div class="col text-left">
+                                {{i.sku_margin_percent}} %
+                            </div>
+
+                        </div>
+
                            <hr class="border-1 border-white mx-5"/>
 
-                        <a v-on:click="sortParam='sku_costsumm_instock', checked=false">
-                        Остатки (закуп.): {{i.sku_costsumm_instock | format }} р.
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
 
-                        <br>
-<!--                        Кол-во артикулов: {{i.sku_quantity}}-->
+                            </div>
+
+                            <div class="col-sm-6 text-left px-2">
+                                <a v-on:click="sortParam='sku_costsumm_instock', checked=false">
+                                Остатки(з.ц.)
+                                </a>
+                            </div>
+
+                            <div class="col text-left">
+                                {{i.sku_costsumm_instock | format }} р.
+                            </div>
+                        </div>
+
+<!--                        Кол-во проданных: {{i.sizes_sold_quantity}} <br>-->
+<!--                        Кол-во в остатке: {{i.sizes_instock_quantity}} <br>-->
+
+
+<!--                        <hr class="border-1 border-white mx-5"/>-->
+<!--                        Посчитаем цифры:<br>-->
+
+
+<!--                        Оборот (закуп.) {{i.sku_costsumm_instock + i.sku_costsumm_sold | format }} р.-->
 <!--                        <br>-->
+<!--                        Рентабельность ROS: {{(i.sku_income*100/i.sku_sellsumm_sold).toLocaleString('ru-RU',{maximumFractionDigits:1}) }} %-->
+<!--                        <br>-->
+<!--                        Валовая маржа Gross Margin:-->
+<!--                        {{(i.sku_income*100/i.sku_sellsumm_sold).toLocaleString('ru-RU',{maximumFractionDigits:1}) }} %-->
                         </p>
 
 
@@ -107,6 +179,10 @@
         </div>
     </div>
 </div>
+
+
+
+
 </div>
 <br>
 

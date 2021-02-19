@@ -1,9 +1,8 @@
-import os
+import os, sys
 
 import xlrd
 import openpyxl as op
 from decimal import *
-
 from skuproject.settings import STATIC_ROOT, STATIC_URL
 
 from .models import UploadedBaseInfo, SKU, Capsule, Season, Size
@@ -71,8 +70,415 @@ def string_to_integer(string):
     except:
         return 0
 
+def sheet_cell(row,column):
+    '''
+    One universal function for get sheet.cell value, both for .xlsx, and for .xls
+    For .xlsx - I use openpyxl, for .xls - xlrd
+    '''
+    global sheet, file_type
+    if file_type=='XLS':
+        return sheet.cell_value(row, column)
+    elif file_type=='XLSX':
+        return sheet.cell(row=row, column=column).value
 
-def handle_uploaded_file(xlsx_file, user_id):
+
+def handle_uploaded_file(excel_file, user_id):
+    '''
+    Version with support of both xls and xlsx types of file
+    Also with support of NEW versions of 1C where is no Номенклатура.Код column
+    Номенклатура looks like "22001GMC1205-98*52*48 Футболка", so sku, size and name are in one cell
+    '''
+    global sheet, file_type
+    file_type = ''
+    if excel_file.name.endswith('.xlsx') or excel_file.name.endswith('.XLSX'):
+        file_type = 'XLSX'
+    elif excel_file.name.endswith('.xls') or excel_file.name.endswith('.XLS'):
+        file_type = 'XLS'
+
+    # -------- Reading config file
+    seasons_configlist = []
+    capsules_configlist = []
+    error_message = ''
+    seasonname_from_config = ''
+    capsulename_from_config = ''
+    try:
+        config = configparser.ConfigParser()
+        config.read('sku_config.ini')
+        seasons_configlist = config['Seasons']
+        capsules_configlist = config['Capsules']
+    except:
+        print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
+        return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
+
+    # -------- Reading Excel file
+    if file_type=='XLS':
+        rb = xlrd.open_workbook(file_contents=excel_file.read())
+        sheet = rb.sheet_by_index(0)
+        rows_quantity=sheet.nrows
+        cols_quantity=sheet.ncols
+
+        range_start_rows=0                 # In xlrd indexing starts from 0
+        range_end_rows=rows_quantity
+        range_start_cols=0
+        range_end_cols=cols_quantity
+
+    elif file_type=='XLSX':
+        wb = op.load_workbook(excel_file, data_only=True)
+        sheet = wb.active
+        rows_quantity=sheet.max_row
+        cols_quantity=sheet.max_column
+
+        range_start_rows=1                # In openpyxl indexing starts from 1
+        range_end_rows=rows_quantity+1
+        range_start_cols=1
+        range_end_cols=cols_quantity+1
+
+
+    # -------- Parsing the header
+    row_header = -1
+    period_from_xls = ''
+    col_sku = col_name = col_quantity_sold = col_sellsumm_sold = col_sellprice_sold = col_costsumm_sold = col_costprice_sold = -1
+    col_income = col_quantity_instock = col_costsumm_instock = -1
+
+    for rownum in range(range_start_rows,range_end_rows):
+        for colnum in range(range_start_cols,range_end_cols):
+
+            if str(sheet_cell(rownum, colnum))[:7] == 'Период:':
+                t1 = sheet_cell(rownum, colnum).find('\n')  # находим место перевода строки
+                period_from_xls = sheet_cell(rownum, colnum)[8:t1]
+
+            if sheet_cell(rownum, colnum) == 'Номенклатура.Код':
+                col_sku = colnum
+
+            if sheet_cell(rownum, colnum) == 'Номенклатура':
+                col_name = colnum
+
+            if sheet_cell(rownum, colnum) == 'Кол-во (продажи)':
+                col_quantity_sold = colnum
+                row_header = rownum
+
+            if sheet_cell(rownum, colnum) == 'Сумма, руб. (продажи)':
+                col_sellsumm_sold = colnum
+
+            # if sheet.cell_value(rownum, colnum) == 'Цена розничная, руб. (продажи)':
+            #     col_sellprice_sold=colnum
+
+            if sheet_cell(rownum, colnum) == 'Сумма себестоимость, руб. (продажи)':
+                col_costsumm_sold = colnum
+
+            # if sheet.cell_value(rownum, colnum) == 'Цена себестоимость, руб. (продажи)':
+            #     col_costprice_sold=colnum
+
+            if sheet_cell(rownum, colnum) == 'Доход, руб.':
+                col_income = colnum
+
+            if sheet_cell(rownum, colnum) == 'Кол-во (остатки)':
+                col_quantity_instock = colnum
+
+            if sheet_cell(rownum, colnum) == 'Сумма себестоимость, руб. (остатки)':
+                col_costsumm_instock = colnum
+
+        if row_header != -1 and rownum > row_header:
+            break  # No need to go through whole file till the end.
+
+    if col_name == -1:
+        return False, "Нет столбца 'Номенклатура'"
+    if col_quantity_sold == -1:
+        return False, "Нет столбца 'Кол-во (продажи)'"
+    if col_sellsumm_sold == -1:
+        return False, "Нет столбца 'Сумма, руб. (продажи)'"
+    # if col_sellprice_sold == -1:
+    #     return False, "Нет столбца 'Цена розничная, руб. (продажи)'"
+    if col_costsumm_sold == -1:
+        return False, "Нет столбца 'Сумма себестоимость, руб. (продажи)'"
+    # if col_costprice_sold == -1:
+    #     return False, "Нет столбца 'Цена себестоимость, руб. (продажи)'"
+    if col_income == -1:
+        return False, "Нет столбца 'Доход, руб.'"
+    if col_quantity_instock == -1:
+        return False, "Нет столбца 'Кол-во (остатки)'"
+    if col_costsumm_instock == -1:
+        return False, "Нет столбца 'Сумма себестоимость, руб. (остатки)'"
+
+    if col_sku == -1:  # Нет столбца Номенклатура.Код
+        # Two possible cases:
+        # 1) version_1c='OLD' and just forgot to include Номенклатура.Код column. Alert an error.
+        # 2) version_1c='NEW', so sku and name are in Номенклатура column
+        it_has_sku=False
+
+        row = row_header + 1  # Starting just below header
+
+        while row < range_end_rows:
+            work_cell = sheet_cell(row, col_name).strip() # Check Номенклатура column
+
+            # Simple validation: if first 3 symbols are digits - this is sku
+            if str(work_cell)[:3].isdigit():
+                it_has_sku=True
+                break   #
+            else:
+                row += 1
+                continue
+
+        if it_has_sku:
+            version_1c='NEW'
+            col_sku=col_name
+        else:
+            return False, 'Нет столбца Номенклатура.Код и в столбце Номенклатура не найдены артикулы'
+
+    else:
+        version_1c='OLD'
+
+
+    # print(period_from_xls, col_sku, col_name, col_quantity_sold, col_sellsumm_sold, col_costsumm_sold)
+    # print(col_income, col_quantity_instock, col_costsumm_instock)
+    # return False, version_1c
+
+    # -------- Forming lists first, then bulk_create
+    season_list = []    # lists of instances
+    capsule_list = []
+    sku_list = []
+    size_list = []
+
+    seasons_checklist = []  # lists for checking if the instance already exist
+    capsules_checklist = []
+    skus_checklist = []
+
+    row = row_header + 1  # Starting just below header
+
+    while row < range_end_rows:
+        work_cell = sheet_cell(row, col_sku).strip()
+
+        # Simple validation: if first 3 symbols are digits - this is sku
+        if not str(work_cell)[:3].isdigit():
+            row += 1
+            continue
+
+        # Проверим все ли в порядке с цифрами и подготовим их для записи в Size ниже
+
+        cell = sheet_cell(row, col_quantity_sold)  # Количество (продажи)
+        if cell:
+            cell = str(cell)
+            q_s = string_to_integer(cell)
+        else:
+            q_s = 0
+
+        cell = sheet_cell(row, col_sellsumm_sold)  # Сумма (продажи)
+        if cell:
+            cell = str(cell)
+            ss_s = string_to_decimal(cell)
+        else:
+            ss_s = 0
+
+        cell = sheet_cell(row, col_costsumm_sold)  # Сумма себестоимость (продажи)
+        if cell:
+            cell = str(cell)
+            cs_s = string_to_decimal(cell)
+        else:
+            cs_s = 0
+
+        cell = sheet_cell(row, col_income)  # Доход
+        if cell:
+            cell = str(cell)
+            incm = string_to_decimal(cell)
+        else:
+            incm = 0
+
+        cell = sheet_cell(row, col_quantity_instock)  # Количество (остатки)
+        if cell:
+            cell = str(cell)
+            q_i = string_to_integer(cell)
+        else:
+            q_i = 0
+
+        cell = sheet_cell(row, col_costsumm_instock)  # Сумма себестоимость (остатки)
+        if cell:
+            cell = str(cell)
+            cs_i = string_to_decimal(cell)
+        else:
+            cs_i = 0
+
+        # Теперь сама проверка: --------------------
+        if q_s <= 0 or ss_s <= 0 or cs_s <= 0:  # Если кол-во проданного, сумма и себестоимость <=0,
+            q_s = 0  # то остальное не имеет смысла. А Доход может быть <=0.
+            ss_s = 0
+            cs_s = 0
+            incm = 0
+
+            if q_i <= 0 or cs_i <= 0:  # Если при этом еще и в Instock тоже <=0, то все, пропускаем строку
+                row += 1
+                continue
+
+        if q_i <= 0 or cs_i <= 0:
+            q_i = cs_i = 0
+        # Конец проверки ------------------------------
+
+        # Разберем прочитанный sku на части
+        sku_name=''
+        t = work_cell.find('-')
+
+        if t != -1:
+            sku_nosize = work_cell[:t]  # Артикул без размера
+            sizelong = work_cell[t + 1:]
+        else:
+            sku_nosize = work_cell
+            sizelong = 'No size'
+
+        if version_1c == 'NEW' and t != -1:
+            postn = sizelong.find(' ')
+
+            if postn == -1:
+                pass
+                #sizelong=sizelong
+                #sku_name=''
+
+            elif sizelong[:postn].lower() == 'no':  #'no size' there
+                tmp=sizelong[postn+1:]
+                postn=tmp.find(' ') # second space
+
+                if postn != -1:
+                    sizelong='No size'
+                    sku_name=tmp[postn+1:]
+
+            else:
+                sku_name = sizelong[postn + 1:]
+                sizelong = sizelong[:postn]
+
+        elif version_1c=='OLD':
+            sku_name = sheet.cell_value(row + 1, col_name)
+
+
+        season = work_cell[:5]  # Первые цифры сезона
+        if season[3:5] == 'GS' or season[3:5] == 'gs':
+            pass  # Значит Школа, берем первые 5 символов
+        else:
+            season = season[0:3]  # Не школа, берем 3 символа
+
+        capsule = sku_nosize[:6]  # Капсула - первые 6 символов артикула
+
+        # Добавим Season
+        if season not in seasons_checklist:
+            seasons_checklist.append(season)
+            try:
+                seasonname_from_config = seasons_configlist[season]
+            except:
+                seasonname_from_config = '----'
+                # print('Не нашелся в конфиге сезон')
+
+            filename = 'images/' + season + '/' + season + '.jpg'
+            image_season = STATIC_URL + filename
+
+            if not os.path.isfile(STATIC_ROOT + '/' + filename):
+                image_season = ''
+
+            # id назначаю сам, потому что сначала вся база создается в памяти, и только в конце будет bulk_create
+            # А так как мне надо установить уже все связи ForeignKey, мне уже нужно знать id
+            # поэтому сделал id типа CharField и вида 'номер строки-user id'
+            # то есть что-то типа '211-18'. Это должно быть уникальным id
+
+            string_id = str(row) + '-' + str(user_id.id)
+            print('string_id:', string_id)
+
+            season_list.append(Season(season_firstletters=season,
+                                      name=seasonname_from_config,
+                                      img=image_season,
+                                      user=user_id,
+                                      id=string_id))  # id назначаю сам
+
+        # Добавим Capsule
+        if capsule not in capsules_checklist:
+            capsules_checklist.append(capsule)
+            try:
+                capsulename_from_config = capsules_configlist[capsule]
+            except:
+                capsulename_from_config = '----'
+                # print('Не нашлась в конфиге капсула')
+
+            filename = 'images/' + season + '/' + capsule + '.jpg'
+            image_capsule = STATIC_URL + filename
+
+            if not os.path.isfile(STATIC_ROOT + '/' + filename):
+                image_capsule = ''
+
+            season_id = [i.id for i in season_list if i.season_firstletters == season][0]
+            # print('season_id', season_id)
+
+            string_id = str(row) + '-' + str(user_id.id)
+
+            capsule_list.append(Capsule(capsule_firstletters=capsule,
+                                        id=string_id,
+                                        name=capsulename_from_config,
+                                        img=image_capsule,
+                                        user=user_id,
+                                        season=Season(id=season_id)))  # корректно ли так писать? так то работает все
+
+        # Добавим Sku
+        if sku_nosize not in skus_checklist:
+            skus_checklist.append(sku_nosize)
+
+            filename = 'images/' + season + '/' + capsule + '/' + sku_nosize + '.jpg'
+            image_sku = STATIC_URL + filename
+
+            if not os.path.isfile(STATIC_ROOT + '/' + filename):
+                image_sku = ''
+
+            capsule_id = [i.id for i in capsule_list if i.capsule_firstletters == capsule][0]
+
+            string_id = str(row) + '-' + str(user_id.id)
+
+            sku_list.append(SKU(name=sku_name,
+                                sku_firstletters=sku_nosize,
+                                id=string_id,
+                                capsule=Capsule(id=capsule_id),
+                                user=user_id,
+                                img=image_sku
+                                ))
+
+        # Добавим Size
+        sku_id = [i.id for i in sku_list if i.sku_firstletters == sku_nosize][0]
+
+        s_s = get_size_short(sizelong)
+
+        size_list.append(Size(size_long=sizelong,
+                              sku_full=work_cell,
+                              sku=SKU(id=sku_id),
+                              user=user_id,
+                              quantity_sold=q_s,
+                              sellsumm_sold=ss_s,
+                              costsumm_sold=cs_s,
+                              income=incm,
+                              quantity_instock=q_i,
+                              costsumm_instock=cs_i,
+                              size_short=s_s
+
+                              ))
+
+        row += 1
+        # if row>40: break    # Пока ограничимся 40 строками
+
+    #   ------------------ Now lets write to database ----------------
+
+    # -------- Удалим всю старую базу
+    UploadedBaseInfo.objects.filter(user=user_id).delete()
+    Season.objects.filter(user=user_id).delete()
+    Capsule.objects.filter(user=user_id).delete()
+    SKU.objects.filter(user=user_id).delete()
+    Size.objects.filter(user=user_id).delete()
+
+    UploadedBaseInfo.objects.create(user=user_id, period=period_from_xls)
+    Season.objects.bulk_create(season_list)
+    Capsule.objects.bulk_create(capsule_list)
+    SKU.objects.bulk_create(sku_list)
+    Size.objects.bulk_create(size_list)
+
+    # print('SEASON!!!!!', Season.objects.all())
+    return True, error_message
+
+
+def handle_uploaded_file_OLD(excel_file, user_id):
+    '''
+    Version without support of both xlsx and xls files
+    And without support of NEW versions of 1C, where column Номенклатура.Код isn't exists
+    '''
 
     # -------- Читаем config файл
     seasons_configlist = []
@@ -90,7 +496,7 @@ def handle_uploaded_file(xlsx_file, user_id):
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
 
     # -------- Читаем Эксель файл
-    rb = xlrd.open_workbook(file_contents=xlsx_file.read())
+    rb = xlrd.open_workbook(file_contents=excel_file.read())
     sheet = rb.sheet_by_index(0)
 
     # -------- Парсим заголовок
@@ -264,6 +670,8 @@ def handle_uploaded_file(xlsx_file, user_id):
 
         capsule = sku_nosize[:6]    # Капсула - первые 6 символов артикула
 
+        sku_name=sheet.cell_value(row+1,col_name)
+
         
         # Добавим Season
         if season not in seasons_checklist:
@@ -336,7 +744,7 @@ def handle_uploaded_file(xlsx_file, user_id):
 
             string_id=str(row)+'-'+str(user_id.id)
 
-            sku_list.append(SKU(name=sheet.cell_value(row+1,col_name),
+            sku_list.append(SKU(name=sku_name,
                                 sku_firstletters=sku_nosize,
                                 id=string_id,
                                 capsule=Capsule(id=capsule_id),
@@ -461,7 +869,7 @@ def upload_onway_bill(xlsx_file, user_id):
     # print('max row and column', sheet.max_row, sheet.max_column)
     # print('row', row, 'row_header', row_header)
 
-    while row < sheet.max_row: # Проверить, не надо ли +1
+    while row < sheet.max_row+1: # Проверить, не надо ли +1
 
         work_cell = sheet.cell(row=row, column=col_sku).value   # Артикул
         if not work_cell:
@@ -563,6 +971,13 @@ def upload_onway_bill(xlsx_file, user_id):
                                           img = image_season,
                                           user = user_id,
                                           id=string_id_season))  #id назначаю сам
+    # Здесь вылезала ошибка - еще в БД не создан Сезон, а мы уже к нему обращаемся через Foreignkey
+    # Поэтому создали сезон сразу здесь, а bulk_create ниже уже для сезона не делаем
+                Season.objects.create(season_firstletters=season,
+                                          name = seasonname_from_config,
+                                          img = image_season,
+                                          user = user_id,
+                                          id=string_id_season)
 
 
         # Добавим Capsule
@@ -572,6 +987,7 @@ def upload_onway_bill(xlsx_file, user_id):
             string_id_capsule=one_entry.id
         else:
             if capsule not in capsules_checklist:
+
                 capsules_checklist.append(capsule)
                 try:
                     capsulename_from_config=capsules_configlist[capsule]
@@ -673,8 +1089,8 @@ def upload_onway_bill(xlsx_file, user_id):
     #   ------------------ Now lets write to database ----------------
 
     # UploadedBaseInfo.objects.create(user=user_id, period=period_from_xls) А если еще не загружена БД, а уже я загружаю ONWAY?
-    if season_list:
-        Season.objects.bulk_create(season_list)
+    # if season_list:
+    #     Season.objects.bulk_create(season_list)
     if capsule_list:
         Capsule.objects.bulk_create(capsule_list)
     if sku_list:

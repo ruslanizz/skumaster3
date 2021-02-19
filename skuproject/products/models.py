@@ -120,6 +120,16 @@ class Capsule(models.Model):
         return queryset.name
 
     @property
+    def sizes_sold_quantity(self):
+        summ = Size.objects.filter(user=self.user, sku__capsule=self.id).aggregate(Sum('quantity_sold'))
+        return round(summ['quantity_sold__sum'])
+
+    @property
+    def sizes_instock_quantity(self):
+        summ = Size.objects.filter(user=self.user, sku__capsule=self.id).aggregate(Sum('quantity_instock'))
+        return round(summ['quantity_instock__sum'])
+
+    @property
     def sold_sizes_forchart(self):  # For Chart.js
         allowed_sizes=['74','80','86','92','98','104','110','116','122','128','134','140','146','152','158','164','170']
         # Чтобы не было разнобоя в графиках, некрасиво когда разные размеры - и шапки и носки в одном графике
@@ -144,6 +154,11 @@ class Capsule(models.Model):
         if len(sizeslist)<=1: return [[],[]]
 
         return [quantitylist, sizeslist]
+
+    # @property
+    # def rating_income(self):
+    #     sku_income
+    #     return rating_number
 
 
 class SKU(models.Model):

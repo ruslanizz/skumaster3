@@ -36,7 +36,9 @@ class CapsuleSerializer(ModelSerializer):
                   'sku_income',
                   'sku_margin_percent',
                   'get_season_name',
-                  'sold_sizes_forchart'
+                  'sold_sizes_forchart',
+                  'sizes_sold_quantity',
+                  'sizes_instock_quantity'
                           ]
 
 

@@ -5,57 +5,47 @@
 {% load static %}
 <div class="jumbotron">
   <h1 class="display-5">Загрузка новых данных</h1>
-  <p class="lead">Загрузите отчет, выгруженный из 1С "Продажа, остатки в днях торговли". <br>
-    В формате .xls (не .xlsx). </p>
-
-      <button type="button" class="btn btn-link" data-toggle="modal" data-target="#MyModal">
-          Какой нужен отчет
-      </button>
+  <p class="lead">
+    Загрузите отчет, выгруженный из 1С "Продажа, остатки в днях торговли". <br>
+    В формате .xls или .xlsx
+  </p>
+  <button type="button" class="btn btn-link" data-toggle="modal" data-target="#MyModal">
+    Какой нужен отчет
+  </button>
 
     <!-- Modal -->
-<div class="modal fade" id="MyModal" tabindex="-1" aria-labelledby="MyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="MyModalLabel">Какой отчет нужно выгрузить из 1С</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Выгрузите из 1С типовой отчет "Продажи, остатки товара в днях торговли" в формате ".xls".<br>
-          Задайте нужный период (например с начала сезона по сегодня).<br><br>
-          Проследите чтобы обязательно были следующие столбцы:<br>
-          Номенклатура.Код и Номенклатура <br>
-          Кол-во (продажи)<br>
-          Сумма, руб. (продажи)<br>
-          Сумма себестоимость, руб. (продажи)<br>
-          Доход, руб.<br>
-          Кол-во (остатки)<br>
-          Сумма себестоимость, руб.(остатки)<br>
-          <br>
-          Другие столбцы тоже могут быть, но главное - чтобы были вышеперечисленные. <br>
-          <a href="{% static 'images/1c_example.jpg' %}" target="_blank">Пример отчета - фото</a>
+    <div class="modal fade" id="MyModal" tabindex="-1" aria-labelledby="MyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="MyModalLabel">Какой отчет нужно выгрузить из 1С</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Выгрузите из 1С типовой отчет "Продажи, остатки товара в днях торговли" в формате ".xls".<br>
+                    Задайте нужный период (например с начала сезона по сегодня).<br><br>
+                    Проследите чтобы обязательно были следующие столбцы:<br>
+                    Номенклатура.Код и Номенклатура <br>
+                    Кол-во (продажи)<br>
+                    Сумма, руб. (продажи)<br>
+                    Сумма себестоимость, руб. (продажи)<br>
+                    Доход, руб.<br>
+                    Кол-во (остатки)<br>
+                    Сумма себестоимость, руб.(остатки)<br>
+                    <br>
+                    Другие столбцы тоже могут быть, но главное - чтобы были вышеперечисленные. <br>
+                    <a href="{% static 'images/1c_example.jpg' %}" target="_blank">Пример отчета - фото</a>
                  &emsp;
-          <a href="https://youtu.be/IUjaaKSZ5AM" target="_blank"> Как выгрузить отчет - видео</a>
-
-<!--          <video controls autoplay>-->
-<!--              <source src="{% static 'images/skumaster.mp4' %}" type="video/mp4">-->
-<!--              <source src="{% static 'images/skumaster.ogv' %}" type="video/ogg">-->
-<!--              <source src="{% static 'images/skumaster.webm' %}" type="video/webm">-->
-<!--          </video>-->
-<!--          <a href="{% static 'images/skumaster.mov' %}" target="_blank">Как сформировать отчет - видео</a>-->
-
-<!--          <img src="{% static 'images/1c_example.png' %}">-->
-      </div>
-      <div class="modal-footer">
-
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Понятно</button>
-      </div>
+                    <a href="https://youtu.be/IUjaaKSZ5AM" target="_blank"> Как выгрузить отчет - видео</a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Понятно</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-
 
   <hr class="my-4">
 
@@ -64,53 +54,41 @@
     <div class="alert alert-warning" role="alert">
         Вы точно правильную таблицу загружаете? {{message}} !
     </div>
+
     {%endif%}
-<div class = "container">
-    <br>
-    <h3> ЗАГРУЗИТЕ ФАЙЛ XLS :</h3>
-    <form enctype="multipart/form-data" method="POST">
-    {% csrf_token %}
-{% verbatim %}
-    <div class="custom-file">
-        <input type="file" name = "xlsx_file" accept=".xls" class="custom-file-input" id="myFile">
-        <label class="custom-file-label" for="myFile">Выберите файл XLS</label>
+
+    <div class = "container">
+        <br>
+        <h3> ЗАГРУЗИТЕ ФАЙЛ XLS :</h3>
+        <form enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+
+            {% verbatim %}
+                <div class="custom-file">
+                    <input type="file" name = "xlsx_file" accept=".xls, .xlsx" class="custom-file-input" id="myFile">
+                    <label class="custom-file-label" for="myFile">Выберите файл XLS</label>
+                </div>
+
+                <br>
+                <br>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            {% endverbatim %}
+        </form>
+
+        <script>
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function() {
+          var fileName = $(this).val().split("\\").pop();
+          $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+        </script>
+
     </div>
-
     <br>
     <br>
-         <button type="submit" class="btn btn-primary">Отправить</button>
-
-
-
-
-{% endverbatim %}
-
-    </form>
-
-
-
-<script>
-// Add the following code if you want the name of the file appear on select
-$(".custom-file-input").on("change", function() {
-  var fileName = $(this).val().split("\\").pop();
-  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-});
-</script>
-</div>
-    <br>
-    <br>
-
-
 
 </div>
 <br>
-
-      <div class="alert alert-primary" role="alert">
-        Загрузить товар в пути:
-    </div>
-
 <br>
-<br>
-
 
 {% endblock %}

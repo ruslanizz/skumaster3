@@ -2,10 +2,11 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+
 from rest_framework.permissions import IsAuthenticated
-from products.models import UploadedBaseInfo, Season, Capsule, SKU
 from rest_framework.viewsets import ModelViewSet
 
+from products.models import UploadedBaseInfo, Season, Capsule, SKU
 from products.serializers import UploadedBaseInfoSerializer, SeasonSerializer, CapsuleSerializer, SkuSerializer
 from products.services import handle_uploaded_file, upload_onway_bill
 
@@ -33,13 +34,10 @@ class SeasonsView(ModelViewSet):
 
 
 def demo_index_page(request):
-    # if request.method == 'POST':
-
-    demo_user = authenticate(username='test@test.com',
-                                    password='Sosiska25',
-                                    )
+    demo_user = authenticate(username='test@test.com', password='Sosiska25')
     login(request, demo_user)
     return render(request,'index.html')
+
 
 @login_required
 def index_page(request):
@@ -53,10 +51,8 @@ def upload_file(request):
     if request.method == 'POST' and request.FILES.get('xlsx_file'):
 
         uploaded_xlsx_file = request.FILES['xlsx_file']
-        print('Эксель файл загружен:')
-        print('Файл:', uploaded_xlsx_file.name)
-        print('Размер файла:', uploaded_xlsx_file.size)
-        print('--------------------------')
+        # print('Файл:', uploaded_xlsx_file.name)
+        # print('Размер файла:', uploaded_xlsx_file.size)
         successfully_loaded, error_message = handle_uploaded_file(uploaded_xlsx_file, request.user)
         if successfully_loaded:
             return HttpResponseRedirect('/')
@@ -67,15 +63,14 @@ def upload_file(request):
 
 
 def capsules_page(request):
-
     return render(request, 'capsules.html')
 
 
 def sku_page(request):
     return render(request, 'sku.html')
 
-class SkuView(ModelViewSet):
 
+class SkuView(ModelViewSet):
     queryset = SKU.objects.all()
     serializer_class = SkuSerializer
     permission_classes = [IsAuthenticated]
@@ -110,12 +105,9 @@ class CapsulesView(ModelViewSet):
 def onway_page(request):
     successfully_loaded = False
     if request.method == 'POST' and request.FILES.get('xlsx_file'):
-
         uploaded_xlsx_file = request.FILES['xlsx_file']
-        print('Эксель файл загружен:')
-        print('Файл:', uploaded_xlsx_file.name)
-        print('Размер файла:', uploaded_xlsx_file.size)
-        print('--------------------------')
+        # print('Файл:', uploaded_xlsx_file.name)
+        # print('Размер файла:', uploaded_xlsx_file.size)
         successfully_loaded, error_message = upload_onway_bill(uploaded_xlsx_file, request.user)
         if successfully_loaded:
             return HttpResponseRedirect('/')
