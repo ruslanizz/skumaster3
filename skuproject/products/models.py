@@ -1,12 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.db.models import Sum
-
 from products.godzilla import build_sizes_grid
 
 
 class UploadedBaseInfo(models.Model):
-    period=models.CharField(max_length=100, default='', blank=True)
+    period = models.CharField(max_length=100, default='', blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -29,7 +28,6 @@ class UploadedBaseInfo(models.Model):
     def total_costsumm_instock(self):
         summ = Size.objects.filter(user=self.user).aggregate(Sum('costsumm_instock'))
         return round(summ['costsumm_instock__sum'])
-
 
 
 class Season(models.Model):
@@ -131,12 +129,11 @@ class Capsule(models.Model):
 
     @property
     def sold_sizes_forchart(self):  # For Chart.js
-        allowed_sizes=['74','80','86','92','98','104','110','116','122','128','134','140','146','152','158','164','170']
-        # Чтобы не было разнобоя в графиках, некрасиво когда разные размеры - и шапки и носки в одном графике
+        allowed_sizes = ['74','80','86','92','98','104','110','116','122','128','134','140','146','152','158','164','170']
         sizesdict = {}
         sizeslist = []
         quantitylist = []
-        sorted_dict={}
+        sorted_dict = {}
         queryset = list(Size.objects.filter(user=self.user, sku__capsule=self.id, quantity_sold__gt=0))
         for i in queryset:
             if i.size_short in allowed_sizes:
@@ -145,20 +142,16 @@ class Capsule(models.Model):
                 else:
                     sizesdict[i.size_short] += i.quantity_sold
 
-        sorted_dict={x:sizesdict[x] for x in sorted(sizesdict, key=int)}
+        sorted_dict = {x: sizesdict[x] for x in sorted(sizesdict, key=int)}
 
-        for key, value in sorted_dict.items(): # Кажется есть риск что будет не по порядку!
+        for key, value in sorted_dict.items():
             sizeslist.append(key)
             quantitylist.append(value)
 
-        if len(sizeslist)<=1: return [[],[]]
+        if len(sizeslist) <= 1:
+            return [[], []]
 
         return [quantitylist, sizeslist]
-
-    # @property
-    # def rating_income(self):
-    #     sku_income
-    #     return rating_number
 
 
 class SKU(models.Model):
@@ -210,12 +203,11 @@ class SKU(models.Model):
 
     @property
     def sizes_grid(self):
-        queryset=Size.objects.filter(user=self.user, sku=self.id)
-        grid={}
+        queryset = Size.objects.filter(user=self.user, sku=self.id)
+        grid = {}
 
         for i in queryset:
-            # grid[i.size_short]=[i.quantity_instock, i.quantity_sold]
-            grid[i.size_short]=[i.quantity_instock, i.quantity_sold, i.quantity_onway]
+            grid[i.size_short] = [i.quantity_instock, i.quantity_sold, i.quantity_onway]
 
         result = build_sizes_grid(grid)
 
@@ -250,4 +242,3 @@ class Size(models.Model):
     def __str__(self):
         return self.sku_full
 
-# class Onway(models.Model):

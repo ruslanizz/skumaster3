@@ -8,36 +8,29 @@
 <div v-cloak id="capsulesapp">
 
   <nav aria-label="breadcrumb" style="font-size: 1.2rem;">
-  <ol class="breadcrumb">
-    <!--           <div v-if="sku_data[0]">-->
-    <li class="breadcrumb-item"><a href="/">Сезон: {{capsules_data[0].get_season_name}}</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Коллекции</li>
-    <!--           </div>-->
-  </ol>
+      <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Сезон: {{capsules_data[0].get_season_name}}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Коллекции</li>
+      </ol>
   </nav>
 
-
-<div class="container mx-0">
+  <div class="container mx-0">
       <div class="row">
-<!--    <div class="col">-->
-<!--      <h4>КОЛЛЕКЦИИ</h4>-->
-<!--    </div>-->
+          <div class="col">
+              <p class="text-end">Для сортировки по параметру - нажмите на него</p>
+          </div>
 
-    <div class="col">
-      <p class="text-end">Для сортировки по параметру - нажмите на него</p>
-    </div>
+           <div class="col">
+               <div class="form-check form-check-inline">
+                   <input class="form-check-input" type="checkbox" id="CheckboxForCharts" v-model="checked">
+                   <label class="form-check-label" for="CheckboxForCharts">Показать графики "Кол-во проданного"</label>
+               </div>
+           </div>
 
-    <div class="col">
-        <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="CheckboxForCharts" v-model="checked">
-        <label class="form-check-label" for="CheckboxForCharts">Показать графики "Кол-во проданного"</label>
-        </div>
-    </div>
-
+      </div>
   </div>
-</div>
 
-<div class="container-fluid">
+  <div class="container-fluid">
     <div class="row justify-content-center">
         <div v-for = "i in sortedCapsulesData">
             <div class="col">
@@ -46,18 +39,18 @@
                     <a :href="'/sku/?capsule=' + i.id">
                     <img class ="card-img-top img-thumbnail" :src="i.img" v-if="i.img" />
                     </a>
+
                     <div class="card-body">
                         <h3 class="card-title">
                         <a :href="'/sku/?capsule=' + i.id" class="card-link text-white">{{i.name}}</a>
                         </h3>
+
                         <p class="card-text">
 
-<!--                        <h5>-->
                         <a v-on:click="sortParam='capsule_firstletters', checked=false">
                         {{i.capsule_firstletters}}
-                        </a>
-<!--                        </h5>-->
-                        <br>
+                        </a><br>
+
                         <div class="row">
                             <div class="col-sm-1 px-0">
 
@@ -89,7 +82,7 @@
                             </div>
                         </div>
 
-                           <hr class="border-1 border-white mx-5"/>
+                        <hr class="border-1 border-white mx-5"/>
 
                         <div class="row">
                             <div class="col-sm-1 text-left px-0">
@@ -104,9 +97,11 @@
                                 Доход:
                                 </a>
                             </div>
+
                             <div class="col text-left">
                                 {{i.sku_income | format }} р.
                             </div>
+
                         </div>
 
                         <div class="row">
@@ -126,7 +121,7 @@
 
                         </div>
 
-                           <hr class="border-1 border-white mx-5"/>
+                        <hr class="border-1 border-white mx-5"/>
 
                         <div class="row">
                             <div class="col-sm-1 px-0">
@@ -146,12 +141,7 @@
 
 <!--                        Кол-во проданных: {{i.sizes_sold_quantity}} <br>-->
 <!--                        Кол-во в остатке: {{i.sizes_instock_quantity}} <br>-->
-
-
 <!--                        <hr class="border-1 border-white mx-5"/>-->
-<!--                        Посчитаем цифры:<br>-->
-
-
 <!--                        Оборот (закуп.) {{i.sku_costsumm_instock + i.sku_costsumm_sold | format }} р.-->
 <!--                        <br>-->
 <!--                        Рентабельность ROS: {{(i.sku_income*100/i.sku_sellsumm_sold).toLocaleString('ru-RU',{maximumFractionDigits:1}) }} %-->
@@ -160,35 +150,27 @@
 <!--                        {{(i.sku_income*100/i.sku_sellsumm_sold).toLocaleString('ru-RU',{maximumFractionDigits:1}) }} %-->
                         </p>
 
-
                         <div class="card-footer px-0 py-0" v-if="checked == true && i.sold_sizes_forchart[0] > []">
-                         <sizeschart
+                            <sizeschart
                                   v-bind:sizes_list="i.sold_sizes_forchart[0]"
                                   v-bind:labels_list="i.sold_sizes_forchart[1]"
                                   v-bind:mychartid="i.id"
                                   width="220" height="70">
-
-                         </sizeschart>
-                         </div>
-
-
+                            </sizeschart>
+                        </div>
                     </div>
                 </div>
             </div>
             <br><br>
         </div>
     </div>
-</div>
-
-
-
+  </div>
 
 </div>
 <br>
 
-
-
 {% endverbatim %}
+
 <script>
 // Выделяем из адресной строки номер сезона
     const queryString = window.location.search;
@@ -196,7 +178,9 @@
     const season_number = urlParams.get('season')
 
 </script>
+
 <script src="/static/capsules_app.js"></script>
+
 </body>
 </html>
 

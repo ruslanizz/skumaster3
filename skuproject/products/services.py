@@ -1,17 +1,16 @@
 import os, sys
-
 import xlrd
 import openpyxl as op
 from decimal import *
-from skuproject.settings import STATIC_ROOT, STATIC_URL
-
-from .models import UploadedBaseInfo, SKU, Capsule, Season, Size
 import configparser
-
+from skuproject.settings import STATIC_ROOT, STATIC_URL
+from .models import UploadedBaseInfo, SKU, Capsule, Season, Size
 
 def get_size_short(sizelong):
-    # Размер вида 140*72*63  разбирает и на выходе отдает короткую версию размера
-    # причем определяет корректно - если спаренный размер то оставляет обе цифры
+    '''
+    Размер вида 140*72*63  разбирает и на выходе отдает короткую версию размера
+    причем определяет корректно - если спаренный размер то оставляет обе цифры
+    '''
 
     if sizelong.count('*') == 2:  # если в размере две звездочки
         t = sizelong.find('*')  # находим номер символа первой звездочки
@@ -1080,10 +1079,7 @@ def upload_onway_bill(xlsx_file, user_id):
     # Если уже был в БД такой Season, Capsule или SKU - мы их не трогали.
     # А если был уже такой Size - мы ему просто добавили quantity_onway и costsumm_onway
     # Теперь надо записать новое, чего еще не было в БД
-    # print('season_list:', season_list)
-    # print('capsule_list:', capsule_list)
-    # print('sku_list:', sku_list)
-    # print('size_list:', size_list)
+
 
 
     #   ------------------ Now lets write to database ----------------
@@ -1097,8 +1093,5 @@ def upload_onway_bill(xlsx_file, user_id):
         SKU.objects.bulk_create(sku_list)
     if size_list:
         Size.objects.bulk_create(size_list)
-
-    # print('SEASON!!!!!', Season.objects.all())
-
 
     return True, error_message

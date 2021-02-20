@@ -1,4 +1,3 @@
-
 from rest_framework.serializers import ModelSerializer
 from products.models import Season, UploadedBaseInfo, Capsule, SKU
 
@@ -55,7 +54,6 @@ class UploadedBaseInfoSerializer(ModelSerializer):
 
 
 class SkuSerializer(ModelSerializer):
-
     class Meta:
         model = SKU
         fields = ['name',
