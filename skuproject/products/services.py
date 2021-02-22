@@ -93,7 +93,7 @@ def handle_uploaded_file(excel_file, user_id):
     elif excel_file.name.endswith('.xls') or excel_file.name.endswith('.XLS'):
         file_type = 'XLS'
 
-    # -------- Reading config file
+    # Reading config file
     seasons_configlist = []
     capsules_configlist = []
     error_message = ''
@@ -108,7 +108,7 @@ def handle_uploaded_file(excel_file, user_id):
         print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
 
-    # -------- Reading Excel file
+    # Reading Excel file
     if file_type == 'XLS':
         rb = xlrd.open_workbook(file_contents=excel_file.read())
         sheet = rb.sheet_by_index(0)
@@ -131,7 +131,7 @@ def handle_uploaded_file(excel_file, user_id):
         range_start_cols = 1
         range_end_cols = cols_quantity + 1
 
-    # -------- Parsing the header
+    # Parsing the header
     row_header = -1
     period_from_xls = ''
     col_sku = col_name = col_quantity_sold = col_sellsumm_sold = -1
@@ -142,7 +142,7 @@ def handle_uploaded_file(excel_file, user_id):
         for colnum in range(range_start_cols, range_end_cols):
 
             if str(sheet_cell(rownum, colnum))[:7] == 'Период:':
-                t1 = sheet_cell(rownum, colnum).find('\n')  # find breaking the line
+                t1 = sheet_cell(rownum, colnum).find('\n')  # find line break
                 period_from_xls = sheet_cell(rownum, colnum)[8:t1]
 
             if sheet_cell(rownum, colnum) == 'Номенклатура.Код':
@@ -185,12 +185,8 @@ def handle_uploaded_file(excel_file, user_id):
         return False, "Нет столбца 'Кол-во (продажи)'"
     if col_sellsumm_sold == -1:
         return False, "Нет столбца 'Сумма, руб. (продажи)'"
-    # if col_sellprice_sold == -1:
-    #     return False, "Нет столбца 'Цена розничная, руб. (продажи)'"
     if col_costsumm_sold == -1:
         return False, "Нет столбца 'Сумма себестоимость, руб. (продажи)'"
-    # if col_costprice_sold == -1:
-    #     return False, "Нет столбца 'Цена себестоимость, руб. (продажи)'"
     if col_income == -1:
         return False, "Нет столбца 'Доход, руб.'"
     if col_quantity_instock == -1:
@@ -226,7 +222,7 @@ def handle_uploaded_file(excel_file, user_id):
     else:
         version_1c = 'OLD'
 
-    # -------- Forming lists first, then bulk_create
+    # Forming lists first, then bulk_create
     season_list = []  # lists of instances
     capsule_list = []
     sku_list = []
@@ -290,26 +286,26 @@ def handle_uploaded_file(excel_file, user_id):
             cs_i = 0
 
         # Checking values:
-        if q_s <= 0 or ss_s <= 0 or cs_s <= 0:  # Если кол-во проданного, сумма и себестоимость <=0,
-            q_s = 0  # то остальное не имеет смысла. А Доход может быть <=0.
+        if q_s <= 0 or ss_s <= 0 or cs_s <= 0:  # if quantity or summ <=0, everything else doesn't make sense
+            q_s = 0
             ss_s = 0
             cs_s = 0
             incm = 0
 
-            if q_i <= 0 or cs_i <= 0:  # Если при этом еще и в Instock тоже <=0, то все, пропускаем строку
+            if q_i <= 0 or cs_i <= 0:  # if both SOLD and INSTOCK  <=0, skip row
                 row += 1
                 continue
 
         if q_i <= 0 or cs_i <= 0:
             q_i = cs_i = 0
-        # Конец проверки ------------------------------
 
-        # Разберем прочитанный sku на части
+        # Parsing sku
+        # Recieve 1) sku_nosize, 2) sizelong, 3) sizeshort 4) sku_name (empty is possible) 5) season 6) capsule
         sku_name = ''
         t = work_cell.find('-')
 
         if t != -1:
-            sku_nosize = work_cell[:t]  # Артикул без размера
+            sku_nosize = work_cell[:t]
             sizelong = work_cell[t + 1:]
         else:
             sku_nosize = work_cell
@@ -338,22 +334,21 @@ def handle_uploaded_file(excel_file, user_id):
         elif version_1c == 'OLD':
             sku_name = sheet.cell_value(row + 1, col_name)
 
-        season = work_cell[:5]  # Первые цифры сезона
+        season = work_cell[:5]
         if season[3:5] == 'GS' or season[3:5] == 'gs':
-            pass  # Значит Школа, берем первые 5 символов
+            pass  # SCHOOL, we take first 5 symbols
         else:
-            season = season[0:3]  # Не школа, берем 3 символа
+            season = season[0:3]  # NOT SCHOOL, we take first 3 symbols
 
-        capsule = sku_nosize[:6]  # Капсула - первые 6 символов артикула
+        capsule = sku_nosize[:6]
 
-        # Добавим Season
+        # Add Season
         if season not in seasons_checklist:
             seasons_checklist.append(season)
             try:
                 seasonname_from_config = seasons_configlist[season]
             except:
                 seasonname_from_config = '----'
-                # print('Не нашелся в конфиге сезон')
 
             filename = 'images/' + season + '/' + season + '.jpg'
             image_season = STATIC_URL + filename
@@ -361,11 +356,10 @@ def handle_uploaded_file(excel_file, user_id):
             if not os.path.isfile(STATIC_ROOT + '/' + filename):
                 image_season = ''
 
-            # id назначаю сам, потому что сначала вся база создается в памяти, и только в конце будет bulk_create
-            # А так как мне надо установить уже все связи ForeignKey, мне уже нужно знать id
-            # поэтому сделал id типа CharField и вида 'номер строки-user id'
-            # то есть что-то типа '211-18'. Это должно быть уникальным id
-
+            # I have to assign id by myself, because whole database firstly create in memory, and after all - bulk_create.
+            # And I need to organize ForeignKey relations, so I need id for that.
+            # So, my id is CharField and looks like "rownumber-user_id", i.e. 211-18.
+            # And it's unique.
             string_id = str(row) + '-' + str(user_id.id)
             print('string_id:', string_id)
 
@@ -373,16 +367,15 @@ def handle_uploaded_file(excel_file, user_id):
                                       name=seasonname_from_config,
                                       img=image_season,
                                       user=user_id,
-                                      id=string_id))  # id назначаю сам
+                                      id=string_id))
 
-        # Добавим Capsule
+        # Add Capsule
         if capsule not in capsules_checklist:
             capsules_checklist.append(capsule)
             try:
                 capsulename_from_config = capsules_configlist[capsule]
             except:
                 capsulename_from_config = '----'
-                # print('Не нашлась в конфиге капсула')
 
             filename = 'images/' + season + '/' + capsule + '.jpg'
             image_capsule = STATIC_URL + filename
@@ -391,7 +384,6 @@ def handle_uploaded_file(excel_file, user_id):
                 image_capsule = ''
 
             season_id = [i.id for i in season_list if i.season_firstletters == season][0]
-            # print('season_id', season_id)
 
             string_id = str(row) + '-' + str(user_id.id)
 
@@ -400,9 +392,9 @@ def handle_uploaded_file(excel_file, user_id):
                                         name=capsulename_from_config,
                                         img=image_capsule,
                                         user=user_id,
-                                        season=Season(id=season_id)))  # корректно ли так писать? так то работает все
+                                        season=Season(id=season_id)))
 
-        # Добавим Sku
+        # Add Sku
         if sku_nosize not in skus_checklist:
             skus_checklist.append(sku_nosize)
 
@@ -424,7 +416,7 @@ def handle_uploaded_file(excel_file, user_id):
                                 img=image_sku
                                 ))
 
-        # Добавим Size
+        # Add Size
         sku_id = [i.id for i in sku_list if i.sku_firstletters == sku_nosize][0]
 
         s_s = get_size_short(sizelong)
@@ -440,15 +432,13 @@ def handle_uploaded_file(excel_file, user_id):
                               quantity_instock=q_i,
                               costsumm_instock=cs_i,
                               size_short=s_s
-
                               ))
 
         row += 1
-        # if row>40: break    # Пока ограничимся 40 строками
 
-    #   ------------------ Now lets write to database ----------------
+    # -----------------Now lets write to database ----------------
 
-    # -------- Удалим всю старую базу
+    # Delete old base first
     UploadedBaseInfo.objects.filter(user=user_id).delete()
     Season.objects.filter(user=user_id).delete()
     Capsule.objects.filter(user=user_id).delete()
@@ -461,17 +451,16 @@ def handle_uploaded_file(excel_file, user_id):
     SKU.objects.bulk_create(sku_list)
     Size.objects.bulk_create(size_list)
 
-    # print('SEASON!!!!!', Season.objects.all())
     return True, error_message
 
 
 def handle_uploaded_file_OLD(excel_file, user_id):
     '''
-    Version without support of both xlsx and xls files
-    And without support of NEW versions of 1C, where column Номенклатура.Код isn't exists
+    Version supports only xls files
+    And without support of NEW versions of 1C (where column Номенклатура.Код isn't exists)
     '''
 
-    # -------- Читаем config файл
+    # Reading config file
     seasons_configlist = []
     capsules_configlist = []
     error_message = ''
@@ -486,21 +475,22 @@ def handle_uploaded_file_OLD(excel_file, user_id):
         print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
 
-    # -------- Читаем Эксель файл
+    # Reading Excel file
     rb = xlrd.open_workbook(file_contents=excel_file.read())
     sheet = rb.sheet_by_index(0)
 
-    # -------- Парсим заголовок
+    # Parsing header
     row_header = -1
     period_from_xls = ''
-    col_sku = col_name = col_quantity_sold = col_sellsumm_sold = col_sellprice_sold = col_costsumm_sold = col_costprice_sold = -1
+    col_sku = col_name = col_quantity_sold = col_sellsumm_sold = col_sellprice_sold = -1
+    col_costsumm_sold = col_costprice_sold = -1
     col_income = col_quantity_instock = col_costsumm_instock = -1
 
     for rownum in range(sheet.nrows):
         for colnum in range(sheet.ncols):
 
             if str(sheet.cell_value(rownum, colnum))[:7] == 'Период:':
-                t1 = sheet.cell_value(rownum, colnum).find('\n')  # находим место перевода строки
+                t1 = sheet.cell_value(rownum, colnum).find('\n')  # find line break
                 period_from_xls = sheet.cell_value(rownum, colnum)[8:t1]
 
             if sheet.cell_value(rownum, colnum) == 'Номенклатура.Код':
@@ -516,14 +506,8 @@ def handle_uploaded_file_OLD(excel_file, user_id):
             if sheet.cell_value(rownum, colnum) == 'Сумма, руб. (продажи)':
                 col_sellsumm_sold = colnum
 
-            # if sheet.cell_value(rownum, colnum) == 'Цена розничная, руб. (продажи)':
-            #     col_sellprice_sold=colnum
-
             if sheet.cell_value(rownum, colnum) == 'Сумма себестоимость, руб. (продажи)':
                 col_costsumm_sold = colnum
-
-            # if sheet.cell_value(rownum, colnum) == 'Цена себестоимость, руб. (продажи)':
-            #     col_costprice_sold=colnum
 
             if sheet.cell_value(rownum, colnum) == 'Доход, руб.':
                 col_income = colnum
@@ -535,7 +519,7 @@ def handle_uploaded_file_OLD(excel_file, user_id):
                 col_costsumm_instock = colnum
 
         if row_header != -1 and rownum > row_header:
-            break  # чтобы не пробегать весь файл до конца. Все что надо мы уже выяснили.
+            break  # No need to go through whole file till the end
 
     if col_sku == -1:
         return False, "Нет столбца 'Номенклатура.Код'"
@@ -545,12 +529,8 @@ def handle_uploaded_file_OLD(excel_file, user_id):
         return False, "Нет столбца 'Кол-во (продажи)'"
     if col_sellsumm_sold == -1:
         return False, "Нет столбца 'Сумма, руб. (продажи)'"
-    # if col_sellprice_sold == -1:
-    #     return False, "Нет столбца 'Цена розничная, руб. (продажи)'"
     if col_costsumm_sold == -1:
         return False, "Нет столбца 'Сумма себестоимость, руб. (продажи)'"
-    # if col_costprice_sold == -1:
-    #     return False, "Нет столбца 'Цена себестоимость, руб. (продажи)'"
     if col_income == -1:
         return False, "Нет столбца 'Доход, руб.'"
     if col_quantity_instock == -1:
@@ -558,28 +538,27 @@ def handle_uploaded_file_OLD(excel_file, user_id):
     if col_costsumm_instock == -1:
         return False, "Нет столбца 'Сумма себестоимость, руб. (остатки)'"
 
-    # -------- Читаем из файла строки и формируем списки, затем позже сделаем bulk_create
-    season_list = []  # Список моделей , который мы потом запишем
+    # Forming lists, later - bulk_create
+    season_list = []  # lists of instances
     capsule_list = []
     sku_list = []
     size_list = []
 
-    seasons_checklist = []  # Список по которому мы будем проверять, создана ли уже такая модель
+    seasons_checklist = []  # # lists for checking if the instance already exist
     capsules_checklist = []
     skus_checklist = []
 
-    row = row_header + 1  # Начнем со строки заголовка+1, выше нет смысла начинать
+    row = row_header + 1  # start just below header
 
     while row < sheet.nrows:
         work_cell = sheet.cell_value(row, col_sku).strip()
 
-        # Нехитрым способом проверим что первые три символа - это цифры и значит это артикул
+        # Simple validation: if first 3 symbols are digits - this is sku
         if not str(work_cell)[:3].isdigit():
             row += 1
             continue
 
-        # Проверим все ли в порядке с цифрами и подготовим их для записи в Size ниже
-
+        # Make correct value types
         cell = sheet.cell_value(row, col_quantity_sold)  # Количество (продажи)
         if cell:
             cell = str(cell)
@@ -622,48 +601,46 @@ def handle_uploaded_file_OLD(excel_file, user_id):
         else:
             cs_i = 0
 
-        # Теперь сама проверка: --------------------
-        if q_s <= 0 or ss_s <= 0 or cs_s <= 0:  # Если кол-во проданного, сумма и себестоимость <=0,
-            q_s = 0  # то остальное не имеет смысла. А Доход может быть <=0.
+        # Checking values
+        if q_s <= 0 or ss_s <= 0 or cs_s <= 0:  # if quantity or summ <=0, everything else doesn't make sense
+            q_s = 0
             ss_s = 0
             cs_s = 0
             incm = 0
 
-            if q_i <= 0 or cs_i <= 0:  # Если при этом еще и в Instock тоже <=0, то все, пропускаем строку
+            if q_i <= 0 or cs_i <= 0:  # if both SOLD and INSTOCK  <=0, skip row
                 row += 1
                 continue
 
         if q_i <= 0 or cs_i <= 0:
             q_i = cs_i = 0
-        # Конец проверки ------------------------------
 
-        # Разберем прочитанный sku на части
+        # Parsing sku
         t = work_cell.find('-')
         if t != -1:
-            sku_nosize = work_cell[:t]  # Артикул без размера
+            sku_nosize = work_cell[:t]
             sizelong = work_cell[t + 1:]
         else:
             sku_nosize = work_cell
             sizelong = 'No size'
 
-        season = work_cell[:5]  # Первые цифры сезона
+        season = work_cell[:5]
         if season[3:5] == 'GS' or season[3:5] == 'gs':
-            pass  # Значит Школа, берем первые 5 символов
+            pass  # SCHOOL, we take first 5 symbols
         else:
-            season = season[0:3]  # Не школа, берем 3 символа
+            season = season[0:3]  # NOT SCHOOL, we take first 3 symbols
 
-        capsule = sku_nosize[:6]  # Капсула - первые 6 символов артикула
+        capsule = sku_nosize[:6]
 
         sku_name = sheet.cell_value(row + 1, col_name)
 
-        # Добавим Season
+        # Add Season
         if season not in seasons_checklist:
             seasons_checklist.append(season)
             try:
                 seasonname_from_config = seasons_configlist[season]
             except:
                 seasonname_from_config = '----'
-                # print('Не нашелся в конфиге сезон')
 
             filename = 'images/' + season + '/' + season + '.jpg'
             image_season = STATIC_URL + filename
@@ -671,10 +648,10 @@ def handle_uploaded_file_OLD(excel_file, user_id):
             if not os.path.isfile(STATIC_ROOT + '/' + filename):
                 image_season = ''
 
-            # id назначаю сам, потому что сначала вся база создается в памяти, и только в конце будет bulk_create
-            # А так как мне надо установить уже все связи ForeignKey, мне уже нужно знать id
-            # поэтому сделал id типа CharField и вида 'номер строки-user id'
-            # то есть что-то типа '211-18'. Это должно быть уникальным id
+            # I have to assign id by myself, because whole database firstly create in memory, and after all - bulk_create.
+            # And I need to organize ForeignKey relations, so I need id for that.
+            # So, my id is CharField and looks like "rownumber-user_id", i.e. 211-18.
+            # And it's unique.
 
             string_id = str(row) + '-' + str(user_id.id)
             print('string_id:', string_id)
@@ -683,16 +660,15 @@ def handle_uploaded_file_OLD(excel_file, user_id):
                                       name=seasonname_from_config,
                                       img=image_season,
                                       user=user_id,
-                                      id=string_id))  # id назначаю сам
+                                      id=string_id))
 
-        # Добавим Capsule
+        # Add Capsule
         if capsule not in capsules_checklist:
             capsules_checklist.append(capsule)
             try:
                 capsulename_from_config = capsules_configlist[capsule]
             except:
                 capsulename_from_config = '----'
-                # print('Не нашлась в конфиге капсула')
 
             filename = 'images/' + season + '/' + capsule + '.jpg'
             image_capsule = STATIC_URL + filename
@@ -701,7 +677,6 @@ def handle_uploaded_file_OLD(excel_file, user_id):
                 image_capsule = ''
 
             season_id = [i.id for i in season_list if i.season_firstletters == season][0]
-            # print('season_id', season_id)
 
             string_id = str(row) + '-' + str(user_id.id)
 
@@ -710,9 +685,9 @@ def handle_uploaded_file_OLD(excel_file, user_id):
                                         name=capsulename_from_config,
                                         img=image_capsule,
                                         user=user_id,
-                                        season=Season(id=season_id)))  # корректно ли так писать? так то работает все
+                                        season=Season(id=season_id)))
 
-        # Добавим Sku
+        # Add Sku
         if sku_nosize not in skus_checklist:
             skus_checklist.append(sku_nosize)
 
@@ -734,7 +709,7 @@ def handle_uploaded_file_OLD(excel_file, user_id):
                                 img=image_sku
                                 ))
 
-        # Добавим Size
+        # Add Size
         sku_id = [i.id for i in sku_list if i.sku_firstletters == sku_nosize][0]
 
         s_s = get_size_short(sizelong)
@@ -750,28 +725,26 @@ def handle_uploaded_file_OLD(excel_file, user_id):
                               quantity_instock=q_i,
                               costsumm_instock=cs_i,
                               size_short=s_s
-
                               ))
 
         row += 1
-        # if row>40: break    # Пока ограничимся 40 строками
 
     #   ------------------ Now lets write to database ----------------
 
-    # -------- Удалим всю старую базу
+    # Delete database first (only for current user of course)
     UploadedBaseInfo.objects.filter(user=user_id).delete()
     Season.objects.filter(user=user_id).delete()
     Capsule.objects.filter(user=user_id).delete()
     SKU.objects.filter(user=user_id).delete()
     Size.objects.filter(user=user_id).delete()
 
+    # Then bulk_create
     UploadedBaseInfo.objects.create(user=user_id, period=period_from_xls)
     Season.objects.bulk_create(season_list)
     Capsule.objects.bulk_create(capsule_list)
     SKU.objects.bulk_create(sku_list)
     Size.objects.bulk_create(size_list)
 
-    # print('SEASON!!!!!', Season.objects.all())
     return True, error_message
 
 
