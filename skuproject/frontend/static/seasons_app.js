@@ -1,11 +1,9 @@
 new Vue({
     el:'#seasonsapp',
     data: {
-
         seasons_data: [],
         baseinfo_data: [],
         sortParam : ''
-
            },
 
     created() {
@@ -20,28 +18,26 @@ new Vue({
 
         vm.baseinfo_data = response.data
         })
-
     },
+
     computed: {
-    cleandate: function(){
-        // Выводим дату не в адском формате с милисекундами и в американском формате, а в нормальном виде
-        var just_date = this.baseinfo_data[0]["upload_date"].split('T')[0]
-        var clean_date = just_date.split('-').reverse().join('.')
-        return clean_date},
+        cleandate: function(){
+            // Formatting date
+            var just_date = this.baseinfo_data[0]["upload_date"].split('T')[0]
+            var clean_date = just_date.split('-').reverse().join('.')
+            return clean_date},
 
     sortedSeasonData: function() {
         switch(this.sortParam){
             case 'capsules_sellsumm_sold': return this.seasons_data.sort(sortByCapsulesSellsummSold).reverse();
             case 'capsules_income': return this.seasons_data.sort(sortByCapsulesIncome).reverse();
-
-//
             default: return this.seasons_data.sort(sortByCapsulesSellsummSold).reverse();
             }
             }
-
     },
+
     filters: {
-        // Выводим сумму в формате с пробелами между разрядами
+        // Format summ with spaces between thousands
         format: val => `${val}`.replace(/(\d)(?=(\d{3})+([^\d]|$))/g, '$1 ')
     }
     });

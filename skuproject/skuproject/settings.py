@@ -59,8 +59,7 @@ ROOT_URLCONF = 'skuproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [str(BASE_DIR.joinpath('templates'))], # 17 JAN 2021
-        # 'DIRS': [],
+        'DIRS': [str(BASE_DIR.joinpath('templates'))],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,8 +84,6 @@ DATABASES = {
         'NAME': 'skudb3',
         'USER': 'ruslan_postgres',
         'PASSWORD': '',
-        # 'HOST': '127.0.0.1',
-        # 'PORT': '5432',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -136,9 +133,6 @@ USE_THOUSAND_SEPARATOR = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# MEDIA_URL = '/media/' # 'http://myhost:port/media/'
-
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -148,7 +142,5 @@ REST_FRAMEWORK = {
     )
 }
 
-
-# LOGIN_URL = 'accounts/login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

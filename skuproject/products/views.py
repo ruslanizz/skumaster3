@@ -41,19 +41,15 @@ def demo_index_page(request):
 
 @login_required
 def index_page(request):
-    # print('USER:',request.user)
-    # print('USER ID:',request.user.id)
     return render(request,'index.html')
 
 
 def upload_file(request):
     successfully_loaded = False
     if request.method == 'POST' and request.FILES.get('xlsx_file'):
-
         uploaded_xlsx_file = request.FILES['xlsx_file']
-        # print('Файл:', uploaded_xlsx_file.name)
-        # print('Размер файла:', uploaded_xlsx_file.size)
         successfully_loaded, error_message = handle_uploaded_file(uploaded_xlsx_file, request.user)
+
         if successfully_loaded:
             return HttpResponseRedirect('/')
         else:
@@ -77,7 +73,7 @@ class SkuView(ModelViewSet):
 
     def get_queryset(self):
         """
-        Переопределяем метод чтобы получать фильтрованный queryset
+        Override method to get filtered queryset
         """
         query_set = self.queryset
         param = self.request.query_params.get('capsule', None)
@@ -93,7 +89,7 @@ class CapsulesView(ModelViewSet):
 
     def get_queryset(self):
         """
-        Переопределяем метод чтобы получать фильтрованный queryset
+        Override method to get filtered queryset
         """
         query_set = self.queryset
         param = self.request.query_params.get('season', None)
@@ -106,9 +102,8 @@ def onway_page(request):
     successfully_loaded = False
     if request.method == 'POST' and request.FILES.get('xlsx_file'):
         uploaded_xlsx_file = request.FILES['xlsx_file']
-        # print('Файл:', uploaded_xlsx_file.name)
-        # print('Размер файла:', uploaded_xlsx_file.size)
         successfully_loaded, error_message = upload_onway_bill(uploaded_xlsx_file, request.user)
+
         if successfully_loaded:
             return HttpResponseRedirect('/')
         else:

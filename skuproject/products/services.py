@@ -82,6 +82,7 @@ def sheet_cell(row, column):
 
 def handle_uploaded_file(excel_file, user_id):
     '''
+    This function is parsing uploaded file and write it to database.
     Version with support of both xls and xlsx types of file
     Also with support of NEW versions of 1C where is no Номенклатура.Код column
     Номенклатура looks like "22001GMC1205-98*52*48 Футболка", so sku, size and name are in one cell
@@ -308,7 +309,7 @@ def handle_uploaded_file(excel_file, user_id):
             sku_nosize = work_cell[:t]
             sizelong = work_cell[t + 1:]
         else:
-            sku_nosize = work_cell
+            sku_nosize = work_cell[:12]
             sizelong = 'No size'
 
         if version_1c == 'NEW' and t != -1:
@@ -333,6 +334,7 @@ def handle_uploaded_file(excel_file, user_id):
 
         elif version_1c == 'OLD':
             sku_name = sheet.cell_value(row + 1, col_name)
+        print('sku_nosize', sku_nosize)
 
         season = work_cell[:5]
         if season[3:5] == 'GS' or season[3:5] == 'gs':
@@ -456,8 +458,9 @@ def handle_uploaded_file(excel_file, user_id):
 
 def handle_uploaded_file_OLD(excel_file, user_id):
     '''
-    Version supports only xls files
-    And without support of NEW versions of 1C (where column Номенклатура.Код isn't exists)
+    This function is parsing uploaded file and write it to database.
+    Version supports only xls files.
+    And without support of NEW versions of 1C (where column Номенклатура.Код isn't exists).
     '''
 
     # Reading config file
@@ -749,7 +752,13 @@ def handle_uploaded_file_OLD(excel_file, user_id):
 
 
 def upload_onway_bill(xlsx_file, user_id):
-    # -------- Читаем config файл
+    '''
+    This function parses uploaded bill, then adds to database sizes, that are ON WAY, they aren't in 1C yet.
+    (It's adding, without deleting existing database).
+    Added sizes not taking part in calculations, because it's temporary. Sizes just figured in SKU page, user can see them.
+    '''
+
+    # Reading config file
     seasons_configlist = []
     capsules_configlist = []
     error_message = ''
@@ -764,12 +773,11 @@ def upload_onway_bill(xlsx_file, user_id):
         print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
 
-    # -------- Читаем Эксель файл
-
+    # Reading Excel file
     wb = op.load_workbook(xlsx_file, data_only=True)
     sheet = wb.active
 
-    # -------- Парсим заголовок
+    # Parsing the header
     row_header = -1
 
     col_sku = col_name = col_quantity = col_summ = -1
@@ -792,7 +800,7 @@ def upload_onway_bill(xlsx_file, user_id):
                 col_summ = colnum
 
         if row_header != -1 and rownum > row_header:
-            break  # чтобы не пробегать весь файл до конца. Все что надо мы уже выяснили.
+            break  # No need to go through the whole file till the end
 
     if col_sku == -1:
         return False, "Нет столбца 'Артикул'"
@@ -803,101 +811,88 @@ def upload_onway_bill(xlsx_file, user_id):
     if col_summ == -1:
         return False, "Нет столбца 'Сумма'"
 
-    # -------- Читаем из файла строки и формируем списки, затем позже сделаем bulk_create
-    season_list = []  # Список моделей , который мы потом запишем
+    # Forming lists , then bulk_create
+    season_list = []  # list of instances
     capsule_list = []
     sku_list = []
     size_list = []
 
-    seasons_checklist = []  # Список по которому мы будем проверять, создана ли уже такая модель
+    seasons_checklist = []  # list for checking if instance already exists
     capsules_checklist = []
     skus_checklist = []
 
-    row = row_header + 1  # Начнем со строки заголовка+1, выше нет смысла начинать
+    row = row_header + 1  # start just below the header
 
-    # print('max row and column', sheet.max_row, sheet.max_column)
-    # print('row', row, 'row_header', row_header)
+    while row < sheet.max_row + 1:
 
-    while row < sheet.max_row + 1:  # Проверить, не надо ли +1
-
-        work_cell = sheet.cell(row=row, column=col_sku).value  # Артикул
+        work_cell = sheet.cell(row=row, column=col_sku).value
         if not work_cell:
             row += 1
             continue
 
         work_cell = work_cell.strip()
 
-        # Нехитрым способом проверим что первые три символа - это цифры и значит это артикул
+        # Simple validation: if first 3 symbols are digits - this is sku
         if not str(work_cell)[:3].isdigit():
             row += 1
             continue
 
-        # Проверим все ли в порядке с цифрами и подготовим их для записи в Size ниже
-        print('work_cell', work_cell)
-        cell = sheet.cell(row=row, column=col_name).value  # Наименование
-        print('cell', cell)
+        # Check if everything is ok with values
+        cell = sheet.cell(row=row, column=col_name).value  # name
         if cell:
             pos = cell.split(' ')
             skuname = pos[0]
-            # print('skuname',skuname)
 
-        cell = sheet.cell(row=row, column=col_quantity).value  # Количество
+        cell = sheet.cell(row=row, column=col_quantity).value  # quantity
         if cell:
             cell = str(cell)
             q_onway = string_to_integer(cell)
         else:
             q_onway = 0
-        # print('q_onway', q_onway)
 
-        cell = sheet.cell(row=row, column=col_summ).value  # Сумма
+        cell = sheet.cell(row=row, column=col_summ).value  # summ
         if cell:
             cell = str(cell)
             summ_onway = string_to_decimal(cell)
         else:
             summ_onway = 0
-        # print('summ_onway', summ_onway)
 
-        # Теперь сама проверка: --------------------
-        if q_onway <= 0 or summ_onway <= 0:  # Если кол-во , сумма  <=0,
+        if q_onway <= 0 or summ_onway <= 0:  # If quantity or summ <=0 - skip row
             row += 1
             continue
 
-        # Конец проверки ------------------------------
-
-        # Разберем прочитанный sku на части
+        # Parse the sku
         t = work_cell.find('-')
         if t != -1:
-            sku_nosize = work_cell[:t]  # Артикул без размера
+            sku_nosize = work_cell[:t]
             sizelong = work_cell[t + 1:]
         else:
             sku_nosize = work_cell
             sizelong = 'No size'
 
-        season = work_cell[:5]  # Первые цифры сезона
+        season = work_cell[:5]
         if season[3:5] == 'GS' or season[3:5] == 'gs':
-            pass  # Значит Школа, берем первые 5 символов
+            pass  # SCHOOL, we take first 5 symbols
         else:
-            season = season[0:3]  # Не школа, берем 3 символа
+            season = season[0:3]  # NOT SCHOOL, we take first 3 symbols
 
-        capsule = sku_nosize[:6]  # Капсула - первые 6 символов артикула
+        capsule = sku_nosize[:6]
 
         string_id_season = ''
 
-        # Добавим Season
-        # Но сначала проверим, нет ли его уже в Базе Данных:
+        # Add Season
+        # But first let's check if it already exists in database:
         if Season.objects.filter(season_firstletters=season, user=user_id).exists():
             one_entry = Season.objects.get(season_firstletters=season, user=user_id)
             string_id_season = one_entry.id
-            # print('СУЩЕСТВУЮЩИЙ string_id_season',string_id_season)
-        else:
 
+        else:
             if season not in seasons_checklist:
                 seasons_checklist.append(season)
                 try:
                     seasonname_from_config = seasons_configlist[season]
                 except:
                     seasonname_from_config = '----'
-                    # print('Не нашелся в конфиге сезон')
 
                 filename = 'images/' + season + '/' + season + '.jpg'
                 image_season = STATIC_URL + filename
@@ -905,30 +900,28 @@ def upload_onway_bill(xlsx_file, user_id):
                 if not os.path.isfile(STATIC_ROOT + '/' + filename):
                     image_season = ''
 
-                # id назначаю сам, потому что сначала вся база создается в памяти, и только в конце будет bulk_create
-                # А так как мне надо установить уже все связи ForeignKey, мне уже нужно знать id
-                # поэтому сделал id типа CharField и вида 'onway-номер строки-user id'
-                # то есть что-то типа 'onway-211-18'. Это должно быть уникальным id
-                # добавляю 'onway-' потому что строки могут совпасть с id уже существующими в базе
+                # I have to assign id by myself, because whole database firstly create in memory, and after all - bulk_create.
+                # And I need to organize ForeignKey relations, so I need id for that.
+                # So, my id is CharField and looks like "onway-rownumber-user_id", i.e. onway-211-18.
+                # Add "onway" because rownumber can be the same in existing database, so id-s can interfere.
 
                 string_id_season = 'onway-' + str(row) + '-' + str(user_id.id)
-                # print('НОВЫЙ string_id_season:',string_id_season)
 
                 season_list.append(Season(season_firstletters=season,
                                           name=seasonname_from_config,
                                           img=image_season,
                                           user=user_id,
-                                          id=string_id_season))  # id назначаю сам
-                # Здесь вылезала ошибка - еще в БД не создан Сезон, а мы уже к нему обращаемся через Foreignkey
-                # Поэтому создали сезон сразу здесь, а bulk_create ниже уже для сезона не делаем
+                                          id=string_id_season))
+
+                # I create Season here, not later with bulk_create, because it needs to be existed for ForeignKey relations
                 Season.objects.create(season_firstletters=season,
                                       name=seasonname_from_config,
                                       img=image_season,
                                       user=user_id,
                                       id=string_id_season)
 
-        # Добавим Capsule
-        # Но сначала проверим, нет ли его уже в Базе Данных:
+        # Add Capsule
+        # But first let's check if it already exists in database:
         if Capsule.objects.filter(capsule_firstletters=capsule, user=user_id).exists():
             one_entry = Capsule.objects.get(capsule_firstletters=capsule, user=user_id)
             string_id_capsule = one_entry.id
@@ -940,7 +933,6 @@ def upload_onway_bill(xlsx_file, user_id):
                     capsulename_from_config = capsules_configlist[capsule]
                 except:
                     capsulename_from_config = '----'
-                    # print('Не нашлась в конфиге капсула')
 
                 filename = 'images/' + season + '/' + capsule + '.jpg'
                 image_capsule = STATIC_URL + filename
@@ -949,7 +941,6 @@ def upload_onway_bill(xlsx_file, user_id):
                     image_capsule = ''
 
                 season_id = string_id_season
-                # print('season_id', season_id)
 
                 string_id_capsule = 'onway-' + str(row) + '-' + str(user_id.id)
 
@@ -959,10 +950,10 @@ def upload_onway_bill(xlsx_file, user_id):
                                             img=image_capsule,
                                             user=user_id,
                                             season=Season(
-                                                id=season_id)))  # корректно ли так писать? так то работает все
+                                                id=season_id)))
 
-        # Добавим Sku
-        # Но сначала проверим, нет ли его уже в Базе Данных:
+        # Add Sku
+        # But first let's check if it already exists in database:
         if SKU.objects.filter(sku_firstletters=sku_nosize, user=user_id).exists():
             one_entry = SKU.objects.get(sku_firstletters=sku_nosize, user=user_id)
             string_id_sku = one_entry.id
@@ -988,17 +979,14 @@ def upload_onway_bill(xlsx_file, user_id):
                                     img=image_sku
                                     ))
 
-        # Добавим Size
-        print('******')
+        # Add Size
         if Size.objects.filter(size_long=sizelong, sku=string_id_sku, user=user_id).exists():
             # UPDATE this Size with quantity ONWAY and Summ ONWAY
             one_entry = Size.objects.get(size_long=sizelong, sku=string_id_sku, user=user_id)
-            one_entry.quantity_onway = one_entry.quantity_onway + q_onway  # Если несколько раз будет ONWAY загружаться
+            one_entry.quantity_onway = one_entry.quantity_onway + q_onway
             one_entry.costsumm_onway = one_entry.costsumm_onway + summ_onway
-            # print('ЗАПИСАЛИ!')
             one_entry.save()
         else:
-
             sku_id = string_id_sku
 
             s_s = get_size_short(sizelong)
@@ -1016,23 +1004,15 @@ def upload_onway_bill(xlsx_file, user_id):
                                   size_short=s_s,
                                   quantity_onway=q_onway,
                                   costsumm_onway=summ_onway
-
                                   ))
 
         row += 1
-        # if row>40: break    # Пока ограничимся 40 строками
 
-    # К этому моменту у нас должны сформироваться списки: season_list, capsule_list, sku_list, size_list
-    # В них то, чего еще нет в Базе Данных.
-    # Если уже был в БД такой Season, Capsule или SKU - мы их не трогали.
-    # А если был уже такой Size - мы ему просто добавили quantity_onway и costsumm_onway
-    # Теперь надо записать новое, чего еще не было в БД
+    # By this moment we have lists: season_list, capsule_list, sku_list, size_list
+    # In these lists those instances, that NOT exists in database.
+    # If Size was already exist - we just added qquantity_onway and costsumm_onway
 
-    #   ------------------ Now lets write to database ----------------
-
-    # UploadedBaseInfo.objects.create(user=user_id, period=period_from_xls) А если еще не загружена БД, а уже я загружаю ONWAY?
-    # if season_list:
-    #     Season.objects.bulk_create(season_list)
+    #   ------------------ Now lets write to database new added instances ----------------
     if capsule_list:
         Capsule.objects.bulk_create(capsule_list)
     if sku_list:
