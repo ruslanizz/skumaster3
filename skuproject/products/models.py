@@ -70,6 +70,13 @@ class Season(models.Model):
             return 0
         return round(((self.capsules_sellsumm_sold / (self.capsules_sellsumm_sold - self.capsules_income)) * 100) - 100)
 
+    # @property
+    # def set_capsules_ratings(self):
+    #     if Capsule.objects.filter(user=self.user, season=self.id, rating__gt=0).exists():
+    #         pass
+    #     else:
+
+
 
 class Capsule(models.Model):
     capsule_firstletters = models.CharField(max_length=30, default='', blank=False)
@@ -152,6 +159,10 @@ class Capsule(models.Model):
             return [[], []]
 
         return [quantitylist, sizeslist]
+
+    # @property
+    # def rating_income(self):
+
 
 
 class SKU(models.Model):

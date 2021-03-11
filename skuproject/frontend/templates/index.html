@@ -86,7 +86,7 @@
             <h4 class="text-dark">СЕЗОНЫ</h4>
         </div>
 
-        {% if request.user.email != "test@test.com" %}
+     {% if request.user.email != "test@test.com"  %}
             <div class="col text-left">
                 <a href="/open" role="button" class="btn btn-primary">
                    <i class="bi bi-upload" style="font-size: 1rem;"></i>
@@ -100,11 +100,11 @@
                 </a>
             </div>
 
-        {% else %}
+     {% else %}
             <div class="col text-left">
                 <a href="/open" role="button" class="btn btn-primary disabled" aria-disabled="true">Загрузить новые данные</a>
             </div>
-        {% endif %}
+     {% endif %}
 
     </div>
 

@@ -333,7 +333,7 @@ def handle_uploaded_file(excel_file, user_id):
                 sizelong = sizelong[:postn]
 
         elif version_1c == 'OLD':
-            sku_name = sheet.cell_value(row + 1, col_name)
+            sku_name = sheet_cell(row + 1, col_name)
         print('sku_nosize', sku_nosize)
 
         season = work_cell[:5]
@@ -437,6 +437,10 @@ def handle_uploaded_file(excel_file, user_id):
                               ))
 
         row += 1
+
+    # #------------------Lets give rating badges---------------------
+    # for _season in season_list:
+    #     for _capsule in capsule_list:
 
     # -----------------Now lets write to database ----------------
 
