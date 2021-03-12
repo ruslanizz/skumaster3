@@ -9,6 +9,9 @@ class UploadedBaseInfo(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.user} - {self.upload_date}'
+
     @property
     def total_sellsumm_sold(self):
         summ = Size.objects.filter(user=self.user).aggregate(Sum('sellsumm_sold'))
@@ -38,7 +41,7 @@ class Season(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.season_firstletters} - {self.name}'
+        return f'{self.season_firstletters} - {self.name}   ({self.user})'
 
     @property
     def capsules_quantity(self):
