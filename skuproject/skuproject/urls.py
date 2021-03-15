@@ -23,7 +23,7 @@ from products.views import *
 
 
 router = SimpleRouter()
-router.register('api/seasons', SeasonsView)
+router.register('api/seasons', SeasonsView, basename='seasons')
 router.register('api/baseinfo', UploadedBaseInfoView)
 router.register('api/capsules', CapsulesView, basename='capsules')
 router.register('api/sku', SkuView, basename='sku')
