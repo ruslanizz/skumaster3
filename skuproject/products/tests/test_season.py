@@ -66,19 +66,6 @@ class SeasonTestCase(APITestCase):
                                           sku=self.sku_2,
                                           user=user)
 
-
-    def test_login_page(self):
-        response=self.testclient.get('/accounts/login/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_index_page(self):
-        response=self.testclient.get('/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_capsule_page(self):
-        response=self.testclient.get('/capsules/')
-        self.assertEqual(response.status_code, 200)
-
     def test_capsules_quantity(self):
         url = reverse('seasons-list')
         response=self.testclient.get(url)
