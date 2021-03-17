@@ -1,4 +1,6 @@
 import os, xlrd, configparser
+import sys
+
 import openpyxl as op
 from decimal import *
 from skuproject.settings import STATIC_ROOT, STATIC_URL
@@ -110,27 +112,30 @@ def handle_uploaded_file(excel_file, user_id):
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
 
     # Reading Excel file
-    if file_type == 'XLS':
-        rb = xlrd.open_workbook(file_contents=excel_file.read())
-        sheet = rb.sheet_by_index(0)
-        rows_quantity = sheet.nrows
-        cols_quantity = sheet.ncols
+    try:
+        if file_type == 'XLS':
+            rb = xlrd.open_workbook(file_contents=excel_file.read())
+            sheet = rb.sheet_by_index(0)
+            rows_quantity = sheet.nrows
+            cols_quantity = sheet.ncols
 
-        range_start_rows = 0  # In xlrd indexing starts from 0
-        range_end_rows = rows_quantity
-        range_start_cols = 0
-        range_end_cols = cols_quantity
+            range_start_rows = 0  # In xlrd indexing starts from 0
+            range_end_rows = rows_quantity
+            range_start_cols = 0
+            range_end_cols = cols_quantity
 
-    elif file_type == 'XLSX':
-        wb = op.load_workbook(excel_file, data_only=True)
-        sheet = wb.active
-        rows_quantity = sheet.max_row
-        cols_quantity = sheet.max_column
+        elif file_type == 'XLSX':
+            wb = op.load_workbook(excel_file, data_only=True)
+            sheet = wb.active
+            rows_quantity = sheet.max_row
+            cols_quantity = sheet.max_column
 
-        range_start_rows = 1  # In openpyxl indexing starts from 1
-        range_end_rows = rows_quantity + 1
-        range_start_cols = 1
-        range_end_cols = cols_quantity + 1
+            range_start_rows = 1  # In openpyxl indexing starts from 1
+            range_end_rows = rows_quantity + 1
+            range_start_cols = 1
+            range_end_cols = cols_quantity + 1
+    except:
+        return False, 'Если вы уверены что отчет из 1С выгружен правильно, попробуйте открыть его в Экселе, изменить в нем что-нибудь, (ширину столбца, цвет ячейки и т.д.) и сохранить. Затем загрузите его сюда. Со старыми версиями 1С бывают такие ситуации'
 
     # Parsing the header
     row_header = -1
@@ -204,7 +209,9 @@ def handle_uploaded_file(excel_file, user_id):
         row = row_header + 1  # Starting just below header
 
         while row < range_end_rows:
-            work_cell = sheet_cell(row, col_name).strip()  # Check Номенклатура column
+            work_cell = sheet_cell(row, col_name)  # Check Номенклатура column
+            if work_cell:
+                work_cell.strip()
 
             # Simple validation: if first 3 symbols are digits - this is sku
             if str(work_cell)[:3].isdigit():
@@ -236,7 +243,9 @@ def handle_uploaded_file(excel_file, user_id):
     row = row_header + 1  # Starting just below header
 
     while row < range_end_rows:
-        work_cell = sheet_cell(row, col_sku).strip()
+        work_cell = sheet_cell(row, col_sku)
+        if work_cell:
+            work_cell.strip()
 
         # Simple validation: if first 3 symbols are digits - this is sku
         if not str(work_cell)[:3].isdigit():
