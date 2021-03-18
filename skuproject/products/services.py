@@ -1,5 +1,4 @@
 import os, xlrd, configparser
-import sys
 
 import openpyxl as op
 from decimal import *
@@ -343,7 +342,7 @@ def handle_uploaded_file(excel_file, user_id):
 
         elif version_1c == 'OLD':
             sku_name = sheet_cell(row + 1, col_name)
-        print('sku_nosize', sku_nosize)
+        # print('sku_nosize', sku_nosize)
 
         season = work_cell[:5]
         if season[3:5] == 'GS' or season[3:5] == 'gs':
@@ -372,7 +371,7 @@ def handle_uploaded_file(excel_file, user_id):
             # So, my id is CharField and looks like "rownumber-user_id", i.e. 211-18.
             # And it's unique.
             string_id = str(row) + '-' + str(user_id.id)
-            print('string_id:', string_id)
+            # print('string_id:', string_id)
 
             season_list.append(Season(season_firstletters=season,
                                       name=seasonname_from_config,
@@ -787,8 +786,15 @@ def upload_onway_bill(xlsx_file, user_id):
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
 
     # Reading Excel file
-    wb = op.load_workbook(xlsx_file, data_only=True)
-    sheet = wb.active
+    try:
+        wb = op.load_workbook(xlsx_file, data_only=True)
+        sheet = wb.active
+        print('Файл открыт')
+        print('Количество строк', sheet.max_row )
+        print('Количество столбцов', sheet.max_column )
+
+    except:
+        return False, 'Не получается прочитать файл'
 
     # Parsing the header
     row_header = -1
