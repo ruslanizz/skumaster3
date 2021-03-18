@@ -90,10 +90,13 @@ def handle_uploaded_file(excel_file, user_id):
     '''
     global sheet, file_type
     file_type = ''
-    if excel_file.name.endswith('.xlsx') or excel_file.name.endswith('.XLSX'):
+    filename = excel_file.name.lower()
+    if filename.endswith('.xlsx'):
         file_type = 'XLSX'
-    elif excel_file.name.endswith('.xls') or excel_file.name.endswith('.XLS'):
+    elif filename.endswith('.xls'):
         file_type = 'XLS'
+    else:
+        file_type = 'UNKNOWN'
 
     # Reading config file
     seasons_configlist = []
@@ -133,6 +136,8 @@ def handle_uploaded_file(excel_file, user_id):
             range_end_rows = rows_quantity + 1
             range_start_cols = 1
             range_end_cols = cols_quantity + 1
+        else:
+            return False, 'Неизвестный формат файла'
     except:
         return False, 'Если вы уверены что отчет из 1С выгружен правильно, попробуйте открыть его в Экселе, изменить в нем что-нибудь, (ширину столбца, цвет ячейки и т.д.) и сохранить. Затем загрузите его сюда. Со старыми версиями 1С бывают такие ситуации'
 
@@ -142,6 +147,8 @@ def handle_uploaded_file(excel_file, user_id):
     col_sku = col_name = col_quantity_sold = col_sellsumm_sold = -1
     col_sellprice_sold = col_costsumm_sold = col_costprice_sold = -1
     col_income = col_quantity_instock = col_costsumm_instock = -1
+    row_sku = row_name = -1
+    shift = 0
 
     for rownum in range(range_start_rows, range_end_rows):
         for colnum in range(range_start_cols, range_end_cols):
@@ -152,9 +159,11 @@ def handle_uploaded_file(excel_file, user_id):
 
             if sheet_cell(rownum, colnum) == 'Номенклатура.Код':
                 col_sku = colnum
+                row_sku = rownum
 
             if sheet_cell(rownum, colnum) == 'Номенклатура':
                 col_name = colnum
+                row_name = rownum
 
             if sheet_cell(rownum, colnum) == 'Кол-во (продажи)':
                 col_quantity_sold = colnum
@@ -181,7 +190,7 @@ def handle_uploaded_file(excel_file, user_id):
             if sheet_cell(rownum, colnum) == 'Сумма себестоимость, руб. (остатки)':
                 col_costsumm_instock = colnum
 
-        if row_header != -1 and rownum > row_header:
+        if row_header != -1 and rownum > row_header+2:
             break  # No need to go through whole file till the end
 
     if col_name == -1:
@@ -200,6 +209,7 @@ def handle_uploaded_file(excel_file, user_id):
         return False, "Нет столбца 'Сумма себестоимость, руб. (остатки)'"
 
     if col_sku == -1:  # There is no "Номенклатура.Код" column
+        print('Нет столбца Номенклатура.Код')
         # Two possible cases:
         # 1) version_1c='OLD' and just forgot to include Номенклатура.Код column. Alert an error.
         # 2) version_1c='NEW', so sku and name are in Номенклатура column
@@ -228,6 +238,13 @@ def handle_uploaded_file(excel_file, user_id):
 
     else:
         version_1c = 'OLD'
+
+    print('Version 1C: ', version_1c)
+
+    if version_1c == 'OLD':
+        shift = row_name - row_sku      # Номенклатура and Номенклатура.Код can be on different rows
+                                        # shift - it's relative row position between them
+    print ('shift: ', shift)
 
     # Forming lists first, then bulk_create
     season_list = []  # lists of instances
@@ -341,7 +358,7 @@ def handle_uploaded_file(excel_file, user_id):
                 sizelong = sizelong[:postn]
 
         elif version_1c == 'OLD':
-            sku_name = sheet_cell(row + 1, col_name)
+            sku_name = sheet_cell(row + shift, col_name)
         # print('sku_nosize', sku_nosize)
 
         season = work_cell[:5]
