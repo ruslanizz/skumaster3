@@ -1,6 +1,8 @@
 {% extends 'index.html' %}
 
 {% block my_content %}
+
+{% load static %}
 <br>
 <br>
 <div class="container-fluid">
@@ -26,6 +28,7 @@
         <div class="col text-center">
             <H1 class="text-primary">SKU master</H1>
             <p class="text-secondary">Делает удобнее работу с заказом и подсортировкой коллекции</p>
+            <img src={% static 'images/cover_skumaster.png' %} width= 350 border=2>
 
         </div>
     </div>

@@ -7,22 +7,22 @@ class UploadedBaseInfoAdmin(admin.ModelAdmin):
     search_fields = ['user']
 
 class SeasonAdmin(admin.ModelAdmin):
-    list_display = ['season_firstletters', 'name', 'user']
+    list_display = ['season_firstletters', 'name', 'user', 'id']
     search_fields = ['season_firstletters']
     list_filter = ['name', 'user']
-    ordering = ['season_firstletters', 'name', 'user']
+    ordering = ['season_firstletters', 'name', 'user', 'id']
 
 class CapsuleAdmin(admin.ModelAdmin):
-    list_display = ['capsule_firstletters', 'name', 'user']
+    list_display = ['capsule_firstletters', 'name', 'user', 'id']
     search_fields = ['capsule_firstletters']
     list_filter = ['user']
-    ordering = ['capsule_firstletters', 'name', 'user']
+    ordering = ['capsule_firstletters', 'name', 'user', 'id']
 
 class SKUAdmin(admin.ModelAdmin):
-    list_display = ['sku_firstletters', 'name', 'user']
+    list_display = ['sku_firstletters', 'name', 'user', 'id']
     search_fields = ['sku_firstletters']
     list_filter = ['user']
-    ordering = ['sku_firstletters', 'name', 'user']
+    ordering = ['sku_firstletters', 'name', 'user','id']
 
 class SizeAdmin(admin.ModelAdmin):
     list_display = ['sku_full', 'quantity_sold','quantity_instock','quantity_onway', 'user']

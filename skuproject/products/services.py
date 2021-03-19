@@ -2,6 +2,7 @@ import os, xlrd, configparser
 
 import openpyxl as op
 from decimal import *
+
 from skuproject.settings import STATIC_ROOT, STATIC_URL
 from .models import UploadedBaseInfo, SKU, Capsule, Season, Size
 
@@ -220,7 +221,7 @@ def handle_uploaded_file(excel_file, user_id):
         while row < range_end_rows:
             work_cell = sheet_cell(row, col_name)  # Check Номенклатура column
             if work_cell:
-                work_cell.strip()
+                work_cell = work_cell.strip()
 
             # Simple validation: if first 3 symbols are digits - this is sku
             if str(work_cell)[:3].isdigit():
@@ -260,8 +261,9 @@ def handle_uploaded_file(excel_file, user_id):
 
     while row < range_end_rows:
         work_cell = sheet_cell(row, col_sku)
+
         if work_cell:
-            work_cell.strip()
+            work_cell = work_cell.strip()
 
         # Simple validation: if first 3 symbols are digits - this is sku
         if not str(work_cell)[:3].isdigit():
@@ -943,11 +945,11 @@ def upload_onway_bill(xlsx_file, user_id):
 
                 string_id_season = 'onway-' + str(row) + '-' + str(user_id.id)
 
-                season_list.append(Season(season_firstletters=season,
-                                          name=seasonname_from_config,
-                                          img=image_season,
-                                          user=user_id,
-                                          id=string_id_season))
+                # season_list.append(Season(season_firstletters=season,
+                #                           name=seasonname_from_config,
+                #                           img=image_season,
+                #                           user=user_id,
+                #                           id=string_id_season))
 
                 # I create Season here, not later with bulk_create, because it needs to be existed for ForeignKey relations
                 Season.objects.create(season_firstletters=season,
@@ -980,13 +982,20 @@ def upload_onway_bill(xlsx_file, user_id):
 
                 string_id_capsule = 'onway-' + str(row) + '-' + str(user_id.id)
 
-                capsule_list.append(Capsule(capsule_firstletters=capsule,
-                                            id=string_id_capsule,
-                                            name=capsulename_from_config,
-                                            img=image_capsule,
-                                            user=user_id,
-                                            season=Season(
-                                                id=season_id)))
+                Capsule.objects.create(capsule_firstletters=capsule,
+                        id=string_id_capsule,
+                        name=capsulename_from_config,
+                        img=image_capsule,
+                        user=user_id,
+                        season=Season(id=season_id))
+
+                # capsule_list.append(Capsule(capsule_firstletters=capsule,
+                #                             id=string_id_capsule,
+                #                             name=capsulename_from_config,
+                #                             img=image_capsule,
+                #                             user=user_id,
+                #                             season=Season(
+                #                                 id=season_id)))
 
         # Add Sku
         # But first let's check if it already exists in database:
@@ -1007,16 +1016,24 @@ def upload_onway_bill(xlsx_file, user_id):
 
                 string_id_sku = 'onway-' + str(row) + '-' + str(user_id.id)
 
-                sku_list.append(SKU(name=skuname,
+                SKU.objects.create(name=skuname,
                                     sku_firstletters=sku_nosize,
                                     id=string_id_sku,
                                     capsule=Capsule(id=capsule_id),
                                     user=user_id,
-                                    img=image_sku
-                                    ))
+                                    img=image_sku)
+
+                # sku_list.append(SKU(name=skuname,
+                #                     sku_firstletters=sku_nosize,
+                #                     id=string_id_sku,
+                #                     capsule=Capsule(id=capsule_id),
+                #                     user=user_id,
+                #                     img=image_sku
+                #                     ))
+
 
         # Add Size
-        if Size.objects.filter(size_long=sizelong, sku=string_id_sku, user=user_id).exists():
+        if Size.objects.filter(size_long=sizelong, sku=SKU(id=string_id_sku), user=user_id).exists():
             # UPDATE this Size with quantity ONWAY and Summ ONWAY
             one_entry = Size.objects.get(size_long=sizelong, sku=string_id_sku, user=user_id)
             one_entry.quantity_onway = one_entry.quantity_onway + q_onway
@@ -1044,15 +1061,12 @@ def upload_onway_bill(xlsx_file, user_id):
 
         row += 1
 
-    # By this moment we have lists: season_list, capsule_list, sku_list, size_list
-    # In these lists those instances, that NOT exists in database.
+    # By this moment we have size_list
+    # In this list those instances, that NOT exists in database.
     # If Size was already exist - we just added qquantity_onway and costsumm_onway
 
     #   ------------------ Now lets write to database new added instances ----------------
-    if capsule_list:
-        Capsule.objects.bulk_create(capsule_list)
-    if sku_list:
-        SKU.objects.bulk_create(sku_list)
+
     if size_list:
         Size.objects.bulk_create(size_list)
 
