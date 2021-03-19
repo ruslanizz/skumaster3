@@ -221,7 +221,7 @@ def handle_uploaded_file(excel_file, user_id):
         while row < range_end_rows:
             work_cell = sheet_cell(row, col_name)  # Check Номенклатура column
             if work_cell:
-                work_cell = work_cell.strip()
+                work_cell = str(work_cell).strip()
 
             # Simple validation: if first 3 symbols are digits - this is sku
             if str(work_cell)[:3].isdigit():
@@ -263,7 +263,7 @@ def handle_uploaded_file(excel_file, user_id):
         work_cell = sheet_cell(row, col_sku)
 
         if work_cell:
-            work_cell = work_cell.strip()
+            work_cell = str(work_cell).strip()
 
         # Simple validation: if first 3 symbols are digits - this is sku
         if not str(work_cell)[:3].isdigit():
