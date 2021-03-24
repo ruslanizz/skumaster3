@@ -67,26 +67,36 @@
 
                     <div class="card-body pt-1">
 
-                        <div class="row no-gutters align-items-center">
-                            <div class="col">
-                               <a v-on:click="sortParam='sizes_sellsumm_sold'">
-                                    Продажи (р.ц.):
-                               </a>
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
+
                             </div>
-                            <div class="col">
+
+                            <div class="col-sm-6 text-left px-2">
+                                <a v-on:click="sortParam='sizes_sellsumm_sold'">
+                                    Продажи (р.ц.):
+                                </a>
+                            </div>
+
+                            <div class="col text-left">
                                 <a v-on:click="sortParam='sizes_sellsumm_sold'">
                                     <h4>{{ i.sizes_sellsumm_sold | format }} р.</h4>
                                 </a>
                             </div>
                         </div>
 
-                        <div class="row no-gutters align-items-center">
-                            <div class="col">
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
+
+                            </div>
+
+                            <div class="col-sm-6 text-left px-2">
                                <a v-on:click="sortParam='sizes_costsumm_instock'">
                                     Остатки (з.ц.):
                                </a>
                             </div>
-                            <div class="col">
+
+                            <div class="col text-left">
                                 <a v-on:click="sortParam='sizes_costsumm_instock'">
                                     {{ i.sizes_costsumm_instock | format }} р.
                                 </a>
@@ -95,31 +105,44 @@
 
                         <hr class="border-1 border-secondary mx-5"/>
 
-                        <div class="row no-gutters align-items-center">
-                            <div class="col">
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
+
+                            </div>
+
+                            <div class="col-sm-6 text-left px-2">
                                <a v-on:click="sortParam='margin_percent'">
                                     Наценка:
                                </a>
                             </div>
-                            <div class="col">
+
+                            <div class="col text-left">
                                 <a v-on:click="sortParam='margin_percent'">
                                     <h4>{{ i.margin_percent }} %</h4>
                                 </a>
                             </div>
                         </div>
 
-                        <div class="row no-gutters align-items-center">
-                            <div class="col">
+                        <div class="row">
+                            <div class="col-sm-1 px-0">
+                                <span class="badge badge-warning" v-if ="i.rating_income > 0">
+                                    {{i.rating_income}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6 text-left px-2">
                                <a v-on:click="sortParam='sizes_income'">
                                     Доход:
                                </a>
                             </div>
-                            <div class="col">
+
+                            <div class="col text-left">
                                 <a v-on:click="sortParam='sizes_income'">
                                     {{ i.sizes_income | format }} р.
                                 </a>
                             </div>
                         </div>
+
 
                         <hr class="border-1 border-secondary mx-5"/>
 

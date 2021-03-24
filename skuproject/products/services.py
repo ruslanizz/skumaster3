@@ -465,10 +465,6 @@ def handle_uploaded_file(excel_file, user_id):
 
         row += 1
 
-    # #------------------Lets give rating badges---------------------
-    # for _season in season_list:
-    #     for _capsule in capsule_list:
-
     # -----------------Now lets write to database ----------------
 
     # Delete old base first
@@ -485,6 +481,21 @@ def handle_uploaded_file(excel_file, user_id):
     Size.objects.bulk_create(size_list)
 
     return True, error_message
+
+
+def set_sku_ratings(capsule_id, user_id):
+    incomes = [(x.sizes_income, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
+    sorted_incomes = sorted((incomes), key=lambda x: x[0], reverse=True)
+    print(sorted_incomes)
+
+    place = 1
+    for i in sorted_incomes[:5]:
+        oneentry = SKU.objects.get(id=i[1])
+        if oneentry.sizes_income > 0:
+            oneentry.rating_income = place
+            oneentry.save()
+            place = place + 1
+
 
 
 def handle_uploaded_file_OLD(excel_file, user_id):

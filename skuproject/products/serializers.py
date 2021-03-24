@@ -70,6 +70,7 @@ class SkuSerializer(ModelSerializer):
                   'margin_percent',
                   'sizes_grid',
                   'get_season_name',
-                  'get_capsule_name'
+                  'get_capsule_name',
+                  'rating_income'
                   ]
 

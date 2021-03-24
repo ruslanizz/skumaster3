@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from products.models import UploadedBaseInfo, Season, Capsule, SKU
 from products.serializers import UploadedBaseInfoSerializer, SeasonSerializer, CapsuleSerializer, SkuSerializer
-from products.services import handle_uploaded_file, upload_onway_bill
+from products.services import handle_uploaded_file, upload_onway_bill, set_sku_ratings
 
 
 class UploadedBaseInfoView(ModelViewSet):
@@ -22,15 +22,23 @@ class UploadedBaseInfoView(ModelViewSet):
         return query_set
 
 
+# class SeasonsView(ModelViewSet):
+#     queryset = Season.objects.all()
+#     serializer_class = SeasonSerializer
+#     permission_classes = [IsAuthenticated]
+#
+#     def get_queryset(self):
+#         queryset = self.queryset
+#         query_set = queryset.filter(user=self.request.user)
+#         return query_set
+
+
 class SeasonsView(ModelViewSet):
-    queryset = Season.objects.all()
     serializer_class = SeasonSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = self.queryset
-        query_set = queryset.filter(user=self.request.user)
-        return query_set
+        return Season.objects.filter(user=self.request.user)
 
 
 def demo_index_page(request):
@@ -63,6 +71,15 @@ def capsules_page(request):
 
 
 def sku_page(request):
+    current_capsule = request.GET.get('capsule', None)
+    print('****** Current capsule: = ', current_capsule)
+    # Здесь втыкаем установку рейтингов if еще не установлены
+    if current_capsule != None:
+        oneentry = Capsule.objects.get(id=current_capsule, user=request.user)
+        if not oneentry.sku_ratings_were_set:
+            set_sku_ratings(current_capsule, request.user)
+            oneentry.sku_ratings_were_set = True
+            oneentry.save()
     return render(request, 'sku.html')
 
 

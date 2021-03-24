@@ -88,6 +88,7 @@ class Capsule(models.Model):
     img = models.ImageField(upload_to="", default="default.png", )
     id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    sku_ratings_were_set = models.BooleanField(default=False, editable=False)
 
     def __str__(self):
         return f'{self.capsule_firstletters} - {self.name}'
@@ -163,10 +164,6 @@ class Capsule(models.Model):
 
         return [quantitylist, sizeslist]
 
-    # @property
-    # def rating_income(self):
-
-
 
 class SKU(models.Model):
     name = models.CharField(max_length=100, default='', blank=True)
@@ -175,6 +172,7 @@ class SKU(models.Model):
     id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     img = models.ImageField(upload_to="", default="default.png", )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating_income = models.PositiveSmallIntegerField(default=0, editable=False)
 
     def __str__(self):
         return f'{self.sku_firstletters} - {self.name}'
