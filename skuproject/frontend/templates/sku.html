@@ -14,7 +14,7 @@
   </ol>
   </nav>
 
-    <div class="container-fluid mx-0 ">
+    <div class="container-fluid m-2 ">
       <div class="row align-items-start">
 
         <div class="col">
@@ -41,6 +41,10 @@
           <p>Для сортировки по параметру - нажмите на него</p>
         </div>
 
+        <div class="col">
+          <span class="badge badge-success badge-pill">1</span> - место в рейтинге<br>
+        </div>
+
       </div>
     </div>
 
@@ -61,7 +65,7 @@
                             <a v-on:click="sortParam='sku_firstletters'">
                                 <h4 class="card-title">{{i.sku_firstletters}}</h4>
                             </a>
-                            <h5>{{i.name}}</h5>
+                            <h5 class="crop-text-2">{{i.name}}</h5>
                         </div>
                     </div>
 
@@ -72,13 +76,13 @@
 
                             </div>
 
-                            <div class="col-sm-6 text-left px-2">
+                            <div class="col-sm-6 text-left px-1">
                                 <a v-on:click="sortParam='sizes_sellsumm_sold'">
                                     Продажи (р.ц.):
                                 </a>
                             </div>
 
-                            <div class="col text-left">
+                            <div class="col text-left px-1">
                                 <a v-on:click="sortParam='sizes_sellsumm_sold'">
                                     <h4>{{ i.sizes_sellsumm_sold | format }} р.</h4>
                                 </a>
@@ -90,13 +94,13 @@
 
                             </div>
 
-                            <div class="col-sm-6 text-left px-2">
+                            <div class="col-sm-6 text-left px-1">
                                <a v-on:click="sortParam='sizes_costsumm_instock'">
                                     Остатки (з.ц.):
                                </a>
                             </div>
 
-                            <div class="col text-left">
+                            <div class="col text-left px-1">
                                 <a v-on:click="sortParam='sizes_costsumm_instock'">
                                     {{ i.sizes_costsumm_instock | format }} р.
                                 </a>
@@ -110,33 +114,33 @@
 
                             </div>
 
-                            <div class="col-sm-6 text-left px-2">
+                            <div class="col-sm-6 text-left px-1">
                                <a v-on:click="sortParam='margin_percent'">
                                     Наценка:
                                </a>
                             </div>
 
-                            <div class="col text-left">
+                            <div class="col text-left px-1">
                                 <a v-on:click="sortParam='margin_percent'">
-                                    <h4>{{ i.margin_percent }} %</h4>
+                                    <h4>{{ i.margin_percent }}%</h4>
                                 </a>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-sm-1 px-0">
-                                <span class="badge badge-warning" v-if ="i.rating_income > 0">
+                                <span class="badge badge-pill badge-success" v-if ="i.rating_income > 0">
                                     {{i.rating_income}}
                                 </span>
                             </div>
 
-                            <div class="col-sm-6 text-left px-2">
+                            <div class="col-sm-6 text-left px-1">
                                <a v-on:click="sortParam='sizes_income'">
                                     Доход:
                                </a>
                             </div>
 
-                            <div class="col text-left">
+                            <div class="col text-left px-1">
                                 <a v-on:click="sortParam='sizes_income'">
                                     {{ i.sizes_income | format }} р.
                                 </a>
