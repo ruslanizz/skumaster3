@@ -20,13 +20,13 @@ class CapsuleAdmin(admin.ModelAdmin):
 
 class SKUAdmin(admin.ModelAdmin):
     list_display = ['sku_firstletters', 'name', 'user', 'id']
-    search_fields = ['sku_firstletters']
+    search_fields = ['sku_firstletters', 'id']
     list_filter = ['user']
     ordering = ['sku_firstletters', 'name', 'user','id']
 
 class SizeAdmin(admin.ModelAdmin):
-    list_display = ['sku_full', 'quantity_sold','quantity_instock','quantity_onway', 'user']
-    search_fields = ['sku_full']
+    list_display = ['sku_full', 'quantity_sold','quantity_instock','quantity_onway', 'user', 'id']
+    search_fields = ['sku_full', 'id']
     list_filter = ['user']
     ordering = ['sku_full', 'quantity_sold','quantity_instock','quantity_onway', 'user']
 

@@ -497,302 +497,6 @@ def set_sku_ratings(capsule_id, user_id):
             place = place + 1
 
 
-
-def handle_uploaded_file_OLD(excel_file, user_id):
-    '''
-    This function is parsing uploaded file and write it to database.
-    Version supports only xls files.
-    And without support of NEW versions of 1C (where column Номенклатура.Код isn't exists).
-    '''
-
-    # Reading config file
-    seasons_configlist = []
-    capsules_configlist = []
-    error_message = ''
-    seasonname_from_config = ''
-    capsulename_from_config = ''
-    try:
-        config = configparser.ConfigParser()
-        config.read('sku_config.ini')
-        seasons_configlist = config['Seasons']
-        capsules_configlist = config['Capsules']
-    except:
-        print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
-        return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
-
-    # Reading Excel file
-    rb = xlrd.open_workbook(file_contents=excel_file.read())
-    sheet = rb.sheet_by_index(0)
-
-    # Parsing header
-    row_header = -1
-    period_from_xls = ''
-    col_sku = col_name = col_quantity_sold = col_sellsumm_sold = col_sellprice_sold = -1
-    col_costsumm_sold = col_costprice_sold = -1
-    col_income = col_quantity_instock = col_costsumm_instock = -1
-
-    for rownum in range(sheet.nrows):
-        for colnum in range(sheet.ncols):
-
-            if str(sheet.cell_value(rownum, colnum))[:7] == 'Период:':
-                t1 = sheet.cell_value(rownum, colnum).find('\n')  # find line break
-                period_from_xls = sheet.cell_value(rownum, colnum)[8:t1]
-
-            if sheet.cell_value(rownum, colnum) == 'Номенклатура.Код':
-                col_sku = colnum
-
-            if sheet.cell_value(rownum, colnum) == 'Номенклатура':
-                col_name = colnum
-
-            if sheet.cell_value(rownum, colnum) == 'Кол-во (продажи)':
-                col_quantity_sold = colnum
-                row_header = rownum
-
-            if sheet.cell_value(rownum, colnum) == 'Сумма, руб. (продажи)':
-                col_sellsumm_sold = colnum
-
-            if sheet.cell_value(rownum, colnum) == 'Сумма себестоимость, руб. (продажи)':
-                col_costsumm_sold = colnum
-
-            if sheet.cell_value(rownum, colnum) == 'Доход, руб.':
-                col_income = colnum
-
-            if sheet.cell_value(rownum, colnum) == 'Кол-во (остатки)':
-                col_quantity_instock = colnum
-
-            if sheet.cell_value(rownum, colnum) == 'Сумма себестоимость, руб. (остатки)':
-                col_costsumm_instock = colnum
-
-        if row_header != -1 and rownum > row_header:
-            break  # No need to go through whole file till the end
-
-    if col_sku == -1:
-        return False, "Нет столбца 'Номенклатура.Код'"
-    if col_name == -1:
-        return False, "Нет столбца 'Номенклатура'"
-    if col_quantity_sold == -1:
-        return False, "Нет столбца 'Кол-во (продажи)'"
-    if col_sellsumm_sold == -1:
-        return False, "Нет столбца 'Сумма, руб. (продажи)'"
-    if col_costsumm_sold == -1:
-        return False, "Нет столбца 'Сумма себестоимость, руб. (продажи)'"
-    if col_income == -1:
-        return False, "Нет столбца 'Доход, руб.'"
-    if col_quantity_instock == -1:
-        return False, "Нет столбца 'Кол-во (остатки)'"
-    if col_costsumm_instock == -1:
-        return False, "Нет столбца 'Сумма себестоимость, руб. (остатки)'"
-
-    # Forming lists, later - bulk_create
-    season_list = []  # lists of instances
-    capsule_list = []
-    sku_list = []
-    size_list = []
-
-    seasons_checklist = []  # # lists for checking if the instance already exist
-    capsules_checklist = []
-    skus_checklist = []
-
-    row = row_header + 1  # start just below header
-
-    while row < sheet.nrows:
-        work_cell = sheet.cell_value(row, col_sku).strip()
-
-        # Simple validation: if first 3 symbols are digits - this is sku
-        if not str(work_cell)[:3].isdigit():
-            row += 1
-            continue
-
-        # Make correct value types
-        cell = sheet.cell_value(row, col_quantity_sold)  # Количество (продажи)
-        if cell:
-            cell = str(cell)
-            q_s = string_to_integer(cell)
-        else:
-            q_s = 0
-
-        cell = sheet.cell_value(row, col_sellsumm_sold)  # Сумма (продажи)
-        if cell:
-            cell = str(cell)
-            ss_s = string_to_decimal(cell)
-        else:
-            ss_s = 0
-
-        cell = sheet.cell_value(row, col_costsumm_sold)  # Сумма себестоимость (продажи)
-        if cell:
-            cell = str(cell)
-            cs_s = string_to_decimal(cell)
-        else:
-            cs_s = 0
-
-        cell = sheet.cell_value(row, col_income)  # Доход
-        if cell:
-            cell = str(cell)
-            incm = string_to_decimal(cell)
-        else:
-            incm = 0
-
-        cell = sheet.cell_value(row, col_quantity_instock)  # Количество (остатки)
-        if cell:
-            cell = str(cell)
-            q_i = string_to_integer(cell)
-        else:
-            q_i = 0
-
-        cell = sheet.cell_value(row, col_costsumm_instock)  # Сумма себестоимость (остатки)
-        if cell:
-            cell = str(cell)
-            cs_i = string_to_decimal(cell)
-        else:
-            cs_i = 0
-
-        # Checking values
-        if q_s <= 0 or ss_s <= 0 or cs_s <= 0:  # if quantity or summ <=0, everything else doesn't make sense
-            q_s = 0
-            ss_s = 0
-            cs_s = 0
-            incm = 0
-
-            if q_i <= 0 or cs_i <= 0:  # if both SOLD and INSTOCK  <=0, skip row
-                row += 1
-                continue
-
-        if q_i <= 0 or cs_i <= 0:
-            q_i = cs_i = 0
-
-        # Parsing sku
-        t = work_cell.find('-')
-        if t != -1:
-            sku_nosize = work_cell[:t]
-            sizelong = work_cell[t + 1:]
-        else:
-            sku_nosize = work_cell
-            sizelong = 'No size'
-
-        season = work_cell[:5]
-        if season[3:5] == 'GS' or season[3:5] == 'gs':
-            pass  # SCHOOL, we take first 5 symbols
-        else:
-            season = season[0:3]  # NOT SCHOOL, we take first 3 symbols
-
-        capsule = sku_nosize[:6]
-
-        sku_name = sheet.cell_value(row + 1, col_name)
-
-        # Add Season
-        if season not in seasons_checklist:
-            seasons_checklist.append(season)
-            try:
-                seasonname_from_config = seasons_configlist[season]
-            except:
-                seasonname_from_config = '----'
-
-            filename = 'images/' + season + '/' + season + '.jpg'
-            image_season = STATIC_URL + filename
-
-            if not os.path.isfile(STATIC_ROOT + '/' + filename):
-                image_season = ''
-
-            # I have to assign id by myself, because whole database firstly create in memory, and after all - bulk_create.
-            # And I need to organize ForeignKey relations, so I need id for that.
-            # So, my id is CharField and looks like "rownumber-user_id", i.e. 211-18.
-            # And it's unique.
-
-            string_id = str(row) + '-' + str(user_id.id)
-            print('string_id:', string_id)
-
-            season_list.append(Season(season_firstletters=season,
-                                      name=seasonname_from_config,
-                                      img=image_season,
-                                      user=user_id,
-                                      id=string_id))
-
-        # Add Capsule
-        if capsule not in capsules_checklist:
-            capsules_checklist.append(capsule)
-            try:
-                capsulename_from_config = capsules_configlist[capsule]
-            except:
-                capsulename_from_config = '----'
-
-            filename = 'images/' + season + '/' + capsule + '.jpg'
-            image_capsule = STATIC_URL + filename
-
-            if not os.path.isfile(STATIC_ROOT + '/' + filename):
-                image_capsule = ''
-
-            season_id = [i.id for i in season_list if i.season_firstletters == season][0]
-
-            string_id = str(row) + '-' + str(user_id.id)
-
-            capsule_list.append(Capsule(capsule_firstletters=capsule,
-                                        id=string_id,
-                                        name=capsulename_from_config,
-                                        img=image_capsule,
-                                        user=user_id,
-                                        season=Season(id=season_id)))
-
-        # Add Sku
-        if sku_nosize not in skus_checklist:
-            skus_checklist.append(sku_nosize)
-
-            filename = 'images/' + season + '/' + capsule + '/' + sku_nosize + '.jpg'
-            image_sku = STATIC_URL + filename
-
-            if not os.path.isfile(STATIC_ROOT + '/' + filename):
-                image_sku = ''
-
-            capsule_id = [i.id for i in capsule_list if i.capsule_firstletters == capsule][0]
-
-            string_id = str(row) + '-' + str(user_id.id)
-
-            sku_list.append(SKU(name=sku_name,
-                                sku_firstletters=sku_nosize,
-                                id=string_id,
-                                capsule=Capsule(id=capsule_id),
-                                user=user_id,
-                                img=image_sku
-                                ))
-
-        # Add Size
-        sku_id = [i.id for i in sku_list if i.sku_firstletters == sku_nosize][0]
-
-        s_s = get_size_short(sizelong)
-
-        size_list.append(Size(size_long=sizelong,
-                              sku_full=work_cell,
-                              sku=SKU(id=sku_id),
-                              user=user_id,
-                              quantity_sold=q_s,
-                              sellsumm_sold=ss_s,
-                              costsumm_sold=cs_s,
-                              income=incm,
-                              quantity_instock=q_i,
-                              costsumm_instock=cs_i,
-                              size_short=s_s
-                              ))
-
-        row += 1
-
-    #   ------------------ Now lets write to database ----------------
-
-    # Delete database first (only for current user of course)
-    UploadedBaseInfo.objects.filter(user=user_id).delete()
-    Season.objects.filter(user=user_id).delete()
-    Capsule.objects.filter(user=user_id).delete()
-    SKU.objects.filter(user=user_id).delete()
-    Size.objects.filter(user=user_id).delete()
-
-    # Then bulk_create
-    UploadedBaseInfo.objects.create(user=user_id, period=period_from_xls)
-    Season.objects.bulk_create(season_list)
-    Capsule.objects.bulk_create(capsule_list)
-    SKU.objects.bulk_create(sku_list)
-    Size.objects.bulk_create(size_list)
-
-    return True, error_message
-
-
 def upload_onway_bill(xlsx_file, user_id):
     '''
     This function parses uploaded bill, then adds to database sizes, that are ON WAY, they aren't in 1C yet.
@@ -859,6 +563,13 @@ def upload_onway_bill(xlsx_file, user_id):
         return False, "Нет столбца 'Кол-во'"
     if col_summ == -1:
         return False, "Нет столбца 'Сумма'"
+
+    # How many times onway bills was uploaded. Need for constructing unique id.
+    oneentry = UploadedBaseInfo.objects.get(user=user_id)
+    oneentry.number_onway_bills_uploaded += 1
+    number_onway_bills_uploaded = oneentry.number_onway_bills_uploaded
+    print('number onway bills:', number_onway_bills_uploaded)
+    oneentry.save()
 
     # Forming lists , then bulk_create
     season_list = []  # list of instances
@@ -954,7 +665,7 @@ def upload_onway_bill(xlsx_file, user_id):
                 # So, my id is CharField and looks like "onway-rownumber-user_id", i.e. onway-211-18.
                 # Add "onway" because rownumber can be the same in existing database, so id-s can interfere.
 
-                string_id_season = 'onway-' + str(row) + '-' + str(user_id.id)
+                string_id_season = 'onway-' + str(row) + '-' + str(user_id.id) + '-' + str(number_onway_bills_uploaded)
 
                 # season_list.append(Season(season_firstletters=season,
                 #                           name=seasonname_from_config,
@@ -991,7 +702,7 @@ def upload_onway_bill(xlsx_file, user_id):
 
                 season_id = string_id_season
 
-                string_id_capsule = 'onway-' + str(row) + '-' + str(user_id.id)
+                string_id_capsule = 'onway-' + str(row) + '-' + str(user_id.id) + '-' + str(number_onway_bills_uploaded)
 
                 Capsule.objects.create(capsule_firstletters=capsule,
                         id=string_id_capsule,
@@ -1025,7 +736,7 @@ def upload_onway_bill(xlsx_file, user_id):
 
                 capsule_id = string_id_capsule
 
-                string_id_sku = 'onway-' + str(row) + '-' + str(user_id.id)
+                string_id_sku = 'onway-' + str(row) + '-' + str(user_id.id) + '-' + str(number_onway_bills_uploaded)
 
                 SKU.objects.create(name=skuname,
                                     sku_firstletters=sku_nosize,
