@@ -72,9 +72,7 @@ def capsules_page(request):
 
 def sku_page(request):
     current_capsule = request.GET.get('capsule', None)
-    print('****** Current capsule: = ', current_capsule)
-    # Здесь втыкаем установку рейтингов if еще не установлены
-    if current_capsule != None:
+    if current_capsule is not None:
         oneentry = Capsule.objects.get(id=current_capsule, user=request.user)
         if not oneentry.sku_ratings_were_set:
             set_sku_ratings(current_capsule, request.user)

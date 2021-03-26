@@ -8,7 +8,7 @@ class UploadedBaseInfo(models.Model):
     period = models.CharField(max_length=100, default='', blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    number_onway_bills_uploaded = models.SmallIntegerField(default=0,editable=False)   # how many ONWAY bills was uploaded
+    number_onway_bills_uploaded = models.PositiveSmallIntegerField(default=0,editable=False)   # how many ONWAY bills was uploaded
                                                                                 # Need for constructing unique id
     def __str__(self):
         return f'{self.user} - {self.upload_date}'
@@ -174,6 +174,7 @@ class SKU(models.Model):
     img = models.ImageField(upload_to="", default="default.png", )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating_income = models.PositiveSmallIntegerField(default=0, editable=False)
+    rating_sellsumm_sold = models.PositiveSmallIntegerField(default=0, editable=False)
 
     def __str__(self):
         return f'{self.sku_firstletters} - {self.name}'

@@ -486,13 +486,25 @@ def handle_uploaded_file(excel_file, user_id):
 def set_sku_ratings(capsule_id, user_id):
     incomes = [(x.sizes_income, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
     sorted_incomes = sorted((incomes), key=lambda x: x[0], reverse=True)
-    print(sorted_incomes)
+    print('sorted incomes:', sorted_incomes)
+
+    sellsumm_sold_list = [(x.sizes_sellsumm_sold, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
+    sorted_sellsumm_sold_list = sorted((sellsumm_sold_list), key=lambda x: x[0], reverse=True)
+    print('sorted sellsumm_sold:',sorted_sellsumm_sold_list)
 
     place = 1
     for i in sorted_incomes[:5]:
         oneentry = SKU.objects.get(id=i[1])
         if oneentry.sizes_income > 0:
             oneentry.rating_income = place
+            oneentry.save()
+            place = place + 1
+
+    place = 1
+    for i in sorted_sellsumm_sold_list[:5]:
+        oneentry = SKU.objects.get(id=i[1])
+        if oneentry.sizes_sellsumm_sold > 0:
+            oneentry.rating_sellsumm_sold = place
             oneentry.save()
             place = place + 1
 
