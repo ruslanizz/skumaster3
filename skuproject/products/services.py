@@ -558,7 +558,7 @@ def upload_onway_bill(xlsx_file, user_id):
             if str(sheet.cell(row=rownum, column=colnum).value) == 'Товары (работы, услуги)':
                 col_name = colnum
 
-            if str(sheet.cell(row=rownum, column=colnum).value) == 'Кол-во':
+            if str(sheet.cell(row=rownum, column=colnum).value) == 'Кол-во' or str(sheet.cell(row=rownum, column=colnum).value) == 'Количество':
                 col_quantity = colnum
 
             if str(sheet.cell(row=rownum, column=colnum).value) == 'Сумма':
@@ -602,17 +602,22 @@ def upload_onway_bill(xlsx_file, user_id):
             row += 1
             continue
 
-        work_cell = work_cell.strip()
+        work_cell = str(work_cell).strip()
 
         # Simple validation: if first 3 symbols are digits - this is sku
-        if not str(work_cell)[:3].isdigit():
+        if not work_cell[:3].isdigit():
             row += 1
             continue
 
         # Check if everything is ok with values
+        value_inside_brackets=''
         cell = sheet.cell(row=row, column=col_name).value  # name
         if cell:
             pos = cell.split(' ')
+            pos1 = cell.rfind('(')
+            pos2 = cell.rfind(')')
+            if pos2>pos1:
+                value_inside_brackets=cell[pos1+1:pos2]
             skuname = pos[0]
 
         cell = sheet.cell(row=row, column=col_quantity).value  # quantity
@@ -640,7 +645,10 @@ def upload_onway_bill(xlsx_file, user_id):
             sizelong = work_cell[t + 1:]
         else:
             sku_nosize = work_cell
-            sizelong = 'No size'
+            if value_inside_brackets != '':
+                sizelong = value_inside_brackets
+            else:
+                sizelong = 'No size'
 
         season = work_cell[:5]
         if season[3:5] == 'GS' or season[3:5] == 'gs':

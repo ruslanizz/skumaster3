@@ -175,6 +175,7 @@ class SKU(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating_income = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_sellsumm_sold = models.PositiveSmallIntegerField(default=0, editable=False)
+    # rating_quantity = models.PositiveSmallIntegerField(default=0, editable=False)
 
     def __str__(self):
         return f'{self.sku_firstletters} - {self.name}'
