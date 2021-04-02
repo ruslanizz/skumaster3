@@ -485,12 +485,17 @@ def handle_uploaded_file(excel_file, user_id):
 
 def set_sku_ratings(capsule_id, user_id):
     incomes = [(x.sizes_income, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
-    sorted_incomes = sorted((incomes), key=lambda x: x[0], reverse=True)
+    sorted_incomes = sorted(incomes, key=lambda x: x[0], reverse=True)
     print('sorted incomes:', sorted_incomes)
 
     sellsumm_sold_list = [(x.sizes_sellsumm_sold, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
-    sorted_sellsumm_sold_list = sorted((sellsumm_sold_list), key=lambda x: x[0], reverse=True)
+    sorted_sellsumm_sold_list = sorted(sellsumm_sold_list, key=lambda x: x[0], reverse=True)
     print('sorted sellsumm_sold:',sorted_sellsumm_sold_list)
+
+    quantity_list = [(x.sizes_quantity_sold, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
+    sorted_quantity_list = sorted(quantity_list, key=lambda x: x[0], reverse=True)
+    print('sorted quantity:',sorted_quantity_list)
+
 
     place = 1
     for i in sorted_incomes[:5]:
@@ -505,6 +510,14 @@ def set_sku_ratings(capsule_id, user_id):
         oneentry = SKU.objects.get(id=i[1])
         if oneentry.sizes_sellsumm_sold > 0:
             oneentry.rating_sellsumm_sold = place
+            oneentry.save()
+            place = place + 1
+
+    place = 1
+    for i in sorted_quantity_list[:5]:
+        oneentry = SKU.objects.get(id=i[1])
+        if oneentry.sizes_quantity_sold > 0:
+            oneentry.rating_quantity = place
             oneentry.save()
             place = place + 1
 
@@ -617,7 +630,7 @@ def upload_onway_bill(xlsx_file, user_id):
             pos1 = cell.rfind('(')
             pos2 = cell.rfind(')')
             if pos2>pos1:
-                value_inside_brackets=cell[pos1+1:pos2]
+                value_inside_brackets=cell[pos1+1:pos2]     # size is also in 'name' in brackets
             skuname = pos[0]
 
         cell = sheet.cell(row=row, column=col_quantity).value  # quantity
@@ -682,7 +695,7 @@ def upload_onway_bill(xlsx_file, user_id):
 
                 # I have to assign id by myself, because whole database firstly create in memory, and after all - bulk_create.
                 # And I need to organize ForeignKey relations, so I need id for that.
-                # So, my id is CharField and looks like "onway-rownumber-user_id", i.e. onway-211-18.
+                # So, my id is CharField and looks like "onway-rownumber-user_id-number_onway_bills_uploaded", i.e. onway-211-18-2.
                 # Add "onway" because rownumber can be the same in existing database, so id-s can interfere.
 
                 string_id_season = 'onway-' + str(row) + '-' + str(user_id.id) + '-' + str(number_onway_bills_uploaded)

@@ -72,6 +72,7 @@ class SkuSerializer(ModelSerializer):
                   'get_season_name',
                   'get_capsule_name',
                   'rating_income',
-                  'rating_sellsumm_sold'
+                  'rating_sellsumm_sold',
+                  'rating_quantity'
                   ]
 
