@@ -21,7 +21,6 @@ from rest_framework.routers import SimpleRouter
 
 from products.views import *
 
-
 router = SimpleRouter()
 router.register('api/seasons', SeasonsView, basename='seasons')
 router.register('api/baseinfo', UploadedBaseInfoView)
@@ -38,6 +37,7 @@ urlpatterns = [
     path('capsules/', capsules_page),
     path('accounts/', include('users.urls')),
     path('accounts/', include('django.contrib.auth.urls'))
+
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

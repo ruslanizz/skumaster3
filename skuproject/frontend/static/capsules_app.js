@@ -34,7 +34,8 @@ Vue.component('sizeschart', {
                 },
 
         legend: {
-                display: false},
+                display: false,
+                },
 
         scales: {
             xAxes: [{
