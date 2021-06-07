@@ -91,7 +91,9 @@ class Capsule(models.Model):
     id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     sku_ratings_were_set = models.BooleanField(default=False, editable=False)
-    rating_income_minus_leftovers = models.PositiveSmallIntegerField(default=0, editable=False)
+    rating_income = models.PositiveSmallIntegerField(default=0, editable=False)
+    rating_costsumm_instock = models.PositiveSmallIntegerField(default=0, editable=False)
+    rating_rentability = models.PositiveSmallIntegerField(default=0, editable=False)
 
     def __str__(self):
         return f'{self.capsule_firstletters} - {self.name}'
@@ -168,8 +170,10 @@ class Capsule(models.Model):
         return [quantitylist, sizeslist]
 
     @property
-    def income_minus_leftovers(self):
-        return self.sku_income - self.sku_costsumm_instock
+    def rentability(self):
+        if self.sku_sellsumm_sold == 0:
+            return 0
+        return round((self.sku_income/self.sku_sellsumm_sold)*100, 2)
 
 
 class SKU(models.Model):

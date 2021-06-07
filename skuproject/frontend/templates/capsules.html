@@ -91,7 +91,7 @@
 
                             <div class="col-sm-6 text-left px-2">
                                 <a v-on:click="sortParam='sku_income', checked=false">
-                                Доход:
+                                Прибыль:
                                 </a>
                             </div>
 
@@ -139,30 +139,26 @@
                         <hr class="border-1 border-white mx-5"/>
                         Рейтинги:
                         <div class="row">
-                            <div class="col px-0">
-                               5
+                            <div class="col px-0 mytooltip">
+                                <span class="badge badge-pill badge-light">{{i.rating_income}}</span>
+                                <span class="tooltiptext"> Рейтинг по прибыли </span>
                             </div>
 
-                            <div class="col px-0">
-                               6
+                            <div class="col px-0 mytooltip">
+                                <span class="badge badge-pill badge-light">{{i.rating_costsumm_instock}}</span>
+                                <span class="tooltiptext"> Рейтинг по остаткам  </span>
                             </div>
 
-                            <div class="col px-0">
-                               7
+                            <div class="col px-0 mytooltip">
+                                <span class="tooltiptext"> Рентабельность {{i.rentability}} %</span>
+                                <span class="badge badge-pill badge-light">{{i.rating_rentability}}</span>
                             </div>
 
-                            <div class="col px-0">
-                                8
-                            </div>
                         </div>
 
-                        Общий рейтинг : {{i.rating_income_minus_leftovers}}
+                        Общий рейтинг : {{(i.rating_income + i.rating_costsumm_instock + i.rating_rentability)/3}}
 
-                        <script> $("[data-toggle=tooltip").tooltip(); </script>
 
-<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
-  Tooltip on bottom
-</button>
 
 <!--                        Кол-во проданных: {{i.sizes_sold_quantity}} <br>-->
 <!--                        Кол-во в остатке: {{i.sizes_instock_quantity}} <br>-->

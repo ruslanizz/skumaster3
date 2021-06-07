@@ -829,16 +829,34 @@ def upload_onway_bill(xlsx_file, user_id):
 
 
 def set_capsule_ratings(season_id, user_id):
-    incomes_minus_leftovers = [(x.income_minus_leftovers, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
-    sorted_i_m_l = sorted(incomes_minus_leftovers, key=lambda x: x[0], reverse=True)
-    print('sorted incomes_minus_leftovers:', sorted_i_m_l)
+    rentability_list = [(x.rentability, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
+    sorted_rentability_list = sorted(rentability_list, key=lambda x: x[0], reverse=True)
 
+    costsumm_instock_list = [(x.sku_costsumm_instock, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
+    sorted_costsumm_instock_list = sorted(costsumm_instock_list, key=lambda x: x[0], reverse=False)
+
+    incomes = [(x.sku_income, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
+    sorted_incomes = sorted(incomes, key=lambda x: x[0], reverse=True)
 
     place = 1
-    for i in sorted_i_m_l:
+    for i in sorted_rentability_list:
         oneentry = Capsule.objects.get(id=i[1])
-        # if oneentry.income_minus_leftovers > 0:
-        oneentry.rating_income_minus_leftovers = place
+        # if oneentry.rentability > 0:
+        oneentry.rating_rentability = place
+        oneentry.save()
+        place = place + 1
+
+    place = 1
+    for i in sorted_costsumm_instock_list:
+        oneentry = Capsule.objects.get(id=i[1])
+        oneentry.rating_costsumm_instock = place
+        oneentry.save()
+        place = place + 1
+
+    place = 1
+    for i in sorted_incomes:
+        oneentry = Capsule.objects.get(id=i[1])
+        oneentry.rating_income = place
         oneentry.save()
         place = place + 1
 

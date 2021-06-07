@@ -38,8 +38,10 @@ class CapsuleSerializer(ModelSerializer):
                   'sold_sizes_forchart',
                   'sizes_sold_quantity',
                   'sizes_instock_quantity',
-                  'income_minus_leftovers',
-                  'rating_income_minus_leftovers'
+                  'rentability',
+                  'rating_rentability',
+                  'rating_income',
+                  'rating_costsumm_instock'
                           ]
 
 
