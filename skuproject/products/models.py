@@ -40,6 +40,7 @@ class Season(models.Model):
     id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     img = models.ImageField(upload_to="", default="default.png", )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    capsule_ratings_were_set = models.BooleanField(default=False, editable=False)
 
     def __str__(self):
         return f'{self.season_firstletters} - {self.name}   ({self.user})'
@@ -90,6 +91,7 @@ class Capsule(models.Model):
     id = models.CharField(max_length=100, default='', primary_key=True, editable=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     sku_ratings_were_set = models.BooleanField(default=False, editable=False)
+    rating_income_minus_leftovers = models.PositiveSmallIntegerField(default=0, editable=False)
 
     def __str__(self):
         return f'{self.capsule_firstletters} - {self.name}'
@@ -164,6 +166,10 @@ class Capsule(models.Model):
             return [[], []]
 
         return [quantitylist, sizeslist]
+
+    @property
+    def income_minus_leftovers(self):
+        return self.sku_income - self.sku_costsumm_instock
 
 
 class SKU(models.Model):

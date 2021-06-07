@@ -826,3 +826,20 @@ def upload_onway_bill(xlsx_file, user_id):
         Size.objects.bulk_create(size_list)
 
     return True, error_message
+
+
+def set_capsule_ratings(season_id, user_id):
+    incomes_minus_leftovers = [(x.income_minus_leftovers, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
+    sorted_i_m_l = sorted(incomes_minus_leftovers, key=lambda x: x[0], reverse=True)
+    print('sorted incomes_minus_leftovers:', sorted_i_m_l)
+
+
+    place = 1
+    for i in sorted_i_m_l:
+        oneentry = Capsule.objects.get(id=i[1])
+        # if oneentry.income_minus_leftovers > 0:
+        oneentry.rating_income_minus_leftovers = place
+        oneentry.save()
+        place = place + 1
+
+

@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from products.models import UploadedBaseInfo, Season, Capsule, SKU
 from products.serializers import UploadedBaseInfoSerializer, SeasonSerializer, CapsuleSerializer, SkuSerializer
-from products.services import handle_uploaded_file, upload_onway_bill, set_sku_ratings
+from products.services import handle_uploaded_file, upload_onway_bill, set_sku_ratings, set_capsule_ratings
 
 
 class UploadedBaseInfoView(ModelViewSet):
@@ -67,6 +67,13 @@ def upload_file(request):
 
 
 def capsules_page(request):
+    current_season = request.GET.get('season', None)
+    if current_season is not None:
+        oneentry = Season.objects.get(id=current_season, user=request.user)
+        if not oneentry.capsule_ratings_were_set:
+            set_capsule_ratings(current_season, request.user)
+            oneentry.capsule_ratings_were_set = True
+            oneentry.save()
     return render(request, 'capsules.html')
 
 

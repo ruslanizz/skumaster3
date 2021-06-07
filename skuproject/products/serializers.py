@@ -37,7 +37,9 @@ class CapsuleSerializer(ModelSerializer):
                   'get_season_name',
                   'sold_sizes_forchart',
                   'sizes_sold_quantity',
-                  'sizes_instock_quantity'
+                  'sizes_instock_quantity',
+                  'income_minus_leftovers',
+                  'rating_income_minus_leftovers'
                           ]
 
 
