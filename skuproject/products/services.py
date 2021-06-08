@@ -486,15 +486,15 @@ def handle_uploaded_file(excel_file, user_id):
 def set_sku_ratings(capsule_id, user_id):
     incomes = [(x.sizes_income, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
     sorted_incomes = sorted(incomes, key=lambda x: x[0], reverse=True)
-    print('sorted incomes:', sorted_incomes)
+    # print('sorted incomes:', sorted_incomes)
 
     sellsumm_sold_list = [(x.sizes_sellsumm_sold, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
     sorted_sellsumm_sold_list = sorted(sellsumm_sold_list, key=lambda x: x[0], reverse=True)
-    print('sorted sellsumm_sold:',sorted_sellsumm_sold_list)
+    # print('sorted sellsumm_sold:',sorted_sellsumm_sold_list)
 
     quantity_list = [(x.sizes_quantity_sold, x.id) for x in SKU.objects.filter(capsule=capsule_id, user=user_id)]
     sorted_quantity_list = sorted(quantity_list, key=lambda x: x[0], reverse=True)
-    print('sorted quantity:',sorted_quantity_list)
+    # print('sorted quantity:',sorted_quantity_list)
 
 
     place = 1
@@ -832,11 +832,13 @@ def set_capsule_ratings(season_id, user_id):
     rentability_list = [(x.rentability, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
     sorted_rentability_list = sorted(rentability_list, key=lambda x: x[0], reverse=True)
 
-    costsumm_instock_list = [(x.sku_costsumm_instock, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
-    sorted_costsumm_instock_list = sorted(costsumm_instock_list, key=lambda x: x[0], reverse=False)
+    relativeleftovers_list = [(x.relative_leftovers, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
+    sorted_rel_leftovers_list = sorted(relativeleftovers_list, key=lambda x: x[0], reverse=False)
 
     incomes = [(x.sku_income, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
     sorted_incomes = sorted(incomes, key=lambda x: x[0], reverse=True)
+
+
 
     place = 1
     for i in sorted_rentability_list:
@@ -847,9 +849,9 @@ def set_capsule_ratings(season_id, user_id):
         place = place + 1
 
     place = 1
-    for i in sorted_costsumm_instock_list:
+    for i in sorted_rel_leftovers_list:
         oneentry = Capsule.objects.get(id=i[1])
-        oneentry.rating_costsumm_instock = place
+        oneentry.rating_rel_leftovers = place
         oneentry.save()
         place = place + 1
 
@@ -861,3 +863,14 @@ def set_capsule_ratings(season_id, user_id):
         place = place + 1
 
 
+
+def set_total_rating(season_id, user_id):
+        summ_ratings_list = [(x.summ_of_ratings, x.id) for x in Capsule.objects.filter(season=season_id, user=user_id)]
+        sorted_summ_rating_list = sorted(summ_ratings_list, key=lambda x: x[0], reverse=False)
+
+        place = 1
+        for i in sorted_summ_rating_list:
+            oneentry = Capsule.objects.get(id=i[1])
+            oneentry.rating_total = place
+            oneentry.save()
+            place = place + 1

@@ -92,8 +92,9 @@ class Capsule(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     sku_ratings_were_set = models.BooleanField(default=False, editable=False)
     rating_income = models.PositiveSmallIntegerField(default=0, editable=False)
-    rating_costsumm_instock = models.PositiveSmallIntegerField(default=0, editable=False)
+    rating_rel_leftovers = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_rentability = models.PositiveSmallIntegerField(default=0, editable=False)
+    rating_total = models.PositiveSmallIntegerField(default=0, editable=False)
 
     def __str__(self):
         return f'{self.capsule_firstletters} - {self.name}'
@@ -170,10 +171,22 @@ class Capsule(models.Model):
         return [quantitylist, sizeslist]
 
     @property
-    def rentability(self):
-        if self.sku_sellsumm_sold == 0:
+    def rentability(self):  # return on assets (Рентабельность активов)
+        divisor = self.sku_costsumm_instock+self.sku_costsumm_sold
+        if divisor == 0:
             return 0
-        return round((self.sku_income/self.sku_sellsumm_sold)*100, 2)
+        return round(self.sku_income*100/divisor, 2)
+
+    @property
+    def relative_leftovers(self):
+        divisor = self.sku_costsumm_instock+self.sku_costsumm_sold
+        if divisor == 0:
+            return 0
+        return round(self.sku_costsumm_instock*100/divisor , 2)
+
+    @property
+    def summ_of_ratings(self):
+        return (self.rating_income + self.rating_rel_leftovers  + self.rating_rentability)
 
 
 class SKU(models.Model):

@@ -41,7 +41,9 @@ class CapsuleSerializer(ModelSerializer):
                   'rentability',
                   'rating_rentability',
                   'rating_income',
-                  'rating_costsumm_instock'
+                  'rating_rel_leftovers',
+                  'relative_leftovers',
+                  'rating_total'
                           ]
 
 

@@ -145,19 +145,20 @@
                             </div>
 
                             <div class="col px-0 mytooltip">
-                                <span class="badge badge-pill badge-light">{{i.rating_costsumm_instock}}</span>
-                                <span class="tooltiptext"> Рейтинг по остаткам  </span>
+                                <span class="badge badge-pill badge-light">{{i.rating_rel_leftovers}}</span>
+                                <span class="tooltiptext"> Отн. остатки {{i.relative_leftovers}} %  </span>
                             </div>
 
                             <div class="col px-0 mytooltip">
-                                <span class="tooltiptext"> Рентабельность {{i.rentability}} %</span>
+                                <span class="tooltiptext"> Рентабельность активов {{i.rentability}} %</span>
                                 <span class="badge badge-pill badge-light">{{i.rating_rentability}}</span>
                             </div>
 
                         </div>
 
-                        Общий рейтинг : {{(i.rating_income + i.rating_costsumm_instock + i.rating_rentability)/3}}
-
+                        <a v-on:click="sortParam='total_rating', checked=false">
+                        Общий рейтинг : <span class="badge badge-pill badge-warning"> {{i.rating_total}}</span>
+                        </a>
 
 
 <!--                        Кол-во проданных: {{i.sizes_sold_quantity}} <br>-->
