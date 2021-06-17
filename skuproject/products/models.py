@@ -84,6 +84,7 @@ class Season(models.Model):
 
 
 class Capsule(models.Model):
+
     capsule_firstletters = models.CharField(max_length=30, default='', blank=False)
     name = models.CharField(max_length=50, default='', blank=True)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Сезон')
@@ -95,6 +96,7 @@ class Capsule(models.Model):
     rating_rel_leftovers = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_rentability = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_total = models.PositiveSmallIntegerField(default=0, editable=False)
+
 
     def __str__(self):
         return f'{self.capsule_firstletters} - {self.name}'
@@ -190,6 +192,30 @@ class Capsule(models.Model):
 
 
 class SKU(models.Model):
+    CLOTHES_TYPE_CHOICES = [
+        ('OTHER', 'Остальное'),
+        ('TSHIRT', 'Футболка с коротким рукавом'),
+        ('LONGSLEEVE', 'Футболка с длинным рукавом'),
+        ('SWEATSHOT', 'Толстовка нераспашная'),
+        ('HOODY', 'Толстовка распашная'),
+        ('BLOUSE', 'Блузка'),
+        ('SUNDRESS', 'Сарафан'),
+        ('SWEATER', 'Кардиганы и джемперы'),
+        ('WINDBREAK', 'Ветровка'),
+        ('DENIMJACKT', 'Джинсовая куртка'),
+        ('OUTERWEAR', 'Верхняя одежда'),
+        ('DRESS', 'Платье'),
+        ('SPORTPANTS', 'Спортивные брюки'),
+        ('PANTS', 'Брюки не спортивные'),
+        ('SHORTS', 'Шорты'),
+        ('SKIRT','Юбка'),
+        ('CAP', 'Бейсболка'),
+        ('HAT', 'Шапка'),
+        ('SCARF', 'Шарф'),
+        ('SWIMSUIT', 'Купальники и плавки'),
+        ('SOCKS', 'Носки')
+
+    ]
     name = models.CharField(max_length=100, default='', blank=True)
     sku_firstletters = models.CharField(max_length=15, default='', blank=False)
     capsule = models.ForeignKey(Capsule, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Капсула')
@@ -199,6 +225,7 @@ class SKU(models.Model):
     rating_income = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_sellsumm_sold = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_quantity = models.PositiveSmallIntegerField(default=0, editable=False)
+    clothes_type = models.CharField(max_length=10, choices=CLOTHES_TYPE_CHOICES, default='--')
 
     def __str__(self):
         return f'{self.sku_firstletters} - {self.name}'

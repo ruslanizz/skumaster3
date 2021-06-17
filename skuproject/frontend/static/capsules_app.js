@@ -136,6 +136,7 @@ new Vue({
                 case 'sku_costsumm_instock': return this.capsules_data.sort(sortBySkuCostsummInstock).reverse();
                 case 'sku_income': return this.capsules_data.sort(sortBySkuIncome).reverse();
                 case 'sku_margin_percent': return this.capsules_data.sort(sortBySkuMarginPercent).reverse();
+                case 'total_rating': return this.capsules_data.sort(sortByTotalRating);
                 default: return this.capsules_data.sort(sortByCapsuleFirstletters);
                 }
                 }
@@ -147,3 +148,4 @@ var sortBySkuSellsummSold = function(d1, d2) {return (d1.sku_sellsumm_sold > d2.
 var sortBySkuCostsummInstock = function(d1, d2) {return (d1.sku_costsumm_instock > d2.sku_costsumm_instock) ? 1 : -1;};
 var sortBySkuIncome = function(d1, d2) {return (d1.sku_income > d2.sku_income) ? 1 : -1;};
 var sortBySkuMarginPercent = function(d1, d2) {return (d1.sku_margin_percent > d2.sku_margin_percent) ? 1 : -1;};
+var sortByTotalRating = function(d1, d2) {return (d1.rating_total > d2.rating_total) ? 1 : -1;};

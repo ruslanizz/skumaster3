@@ -371,6 +371,11 @@ def handle_uploaded_file(excel_file, user_id):
 
         capsule = sku_nosize[:6]
 
+        if 'футболка' in sku_name.lower():
+            clothestype='TSHIRT'
+        else:
+            clothestype='OTHER'
+
         # Add Season
         if season not in seasons_checklist:
             seasons_checklist.append(season)
@@ -442,7 +447,8 @@ def handle_uploaded_file(excel_file, user_id):
                                 id=string_id,
                                 capsule=Capsule(id=capsule_id),
                                 user=user_id,
-                                img=image_sku
+                                img=image_sku,
+                                clothes_type = clothestype
                                 ))
 
         # Add Size
@@ -874,3 +880,4 @@ def set_total_rating(season_id, user_id):
             oneentry.rating_total = place
             oneentry.save()
             place = place + 1
+
