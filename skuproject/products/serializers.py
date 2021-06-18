@@ -43,7 +43,10 @@ class CapsuleSerializer(ModelSerializer):
                   'rating_income',
                   'rating_rel_leftovers',
                   'relative_leftovers',
-                  'rating_total'
+                  'rating_total',
+                  'type_of_clothes', # переименовать, это количество футболок и т п
+                  'gender',
+                  'age'
                           ]
 
 
@@ -79,6 +82,7 @@ class SkuSerializer(ModelSerializer):
                   'get_capsule_name',
                   'rating_income',
                   'rating_sellsumm_sold',
-                  'rating_quantity'
+                  'rating_quantity',
+                  'clothes_type'
                   ]
 

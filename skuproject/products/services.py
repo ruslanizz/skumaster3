@@ -83,14 +83,13 @@ def sheet_cell(row, column):
 
 
 def define_clothestype(sku_name,clothestype_configlist):
-    sku_name=sku_name.lower()
-    sku_name=sku_name.strip()
+    sku_name = sku_name.lower()
+    sku_name = sku_name.strip()
+    sku_name = sku_name.replace('-',' ')
     skuname_list = sku_name.split(' ')
     for i in skuname_list:
         if i in clothestype_configlist :
-            # print (sku_name,clothestype_configlist[i] )
             return clothestype_configlist[i]
-
     return 'OTHER'
 
 
@@ -115,19 +114,24 @@ def handle_uploaded_file(excel_file, user_id):
     seasons_configlist = []
     capsules_configlist = []
     clothestype_configlist = []
+    age_configlist= []
     error_message = ''
     seasonname_from_config = ''
     capsulename_from_config = ''
     try:
         config = configparser.ConfigParser()
         config.read('sku_config.ini')
-        seasons_configlist = config['Seasons']
-        capsules_configlist = config['Capsules']
-        clothestype_configlist = config['Clothestypes']
-
     except:
-        print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
+
+    if 'Seasons' in config.sections():
+        seasons_configlist = config['Seasons']
+    if 'Capsules' in config.sections():
+        capsules_configlist = config['Capsules']
+    if 'Clothestypes' in config.sections():
+        clothestype_configlist = config['Clothestypes']
+    if 'Age' in config.sections():
+        age_configlist = config['Age']
 
     # Reading Excel file
     try:
@@ -343,7 +347,8 @@ def handle_uploaded_file(excel_file, user_id):
             q_i = cs_i = 0
 
         # Parsing sku
-        # Recieve 1) sku_nosize, 2) sizelong, 3) sizeshort 4) sku_name (empty is possible) 5) season 6) capsule
+
+        ### SKU_NOSIZE, SIZELONG, SIZESHORT, SKU_NAME ###
         sku_name = ''
         t = work_cell.find('-')
 
@@ -376,16 +381,32 @@ def handle_uploaded_file(excel_file, user_id):
 
         elif version_1c == 'OLD':
             sku_name = sheet_cell(row + shift, col_name)
-        # print('sku_nosize', sku_nosize)
 
+        ### SEASON ###
         season = work_cell[:5]
-        if season[3:5] == 'GS' or season[3:5] == 'gs':
+        if season[3:5].upper() == 'GS':
             pass  # SCHOOL, we take first 5 symbols
         else:
             season = season[0:3]  # NOT SCHOOL, we take first 3 symbols
 
+        ### CAPSULE ###
         capsule = sku_nosize[:6]
 
+        ### GENDER ###
+        if capsule[5].upper() == 'B':
+            gender = 'BOYS'
+        elif capsule[5].upper() == 'G':
+            gender = 'GIRLS'
+        else:
+            gender = 'UNISEX'
+
+        ### AGE ###
+        if age_configlist and capsule in age_configlist:
+            age = age_configlist[capsule]
+        else:
+            age = '---'
+
+        ### CLOTHES TYPE ###
         clothestype = define_clothestype(sku_name, clothestype_configlist)
 
         # Add Season
@@ -438,7 +459,10 @@ def handle_uploaded_file(excel_file, user_id):
                                         name=capsulename_from_config,
                                         img=image_capsule,
                                         user=user_id,
-                                        season=Season(id=season_id)))
+                                        season=Season(id=season_id),
+                                        gender = gender,
+                                        age = age
+                                        ))
 
         # Add Sku
         if sku_nosize not in skus_checklist:

@@ -84,7 +84,18 @@ class Season(models.Model):
 
 
 class Capsule(models.Model):
-
+    GENDER_CHOICES = [
+        ('GIRLS','Девочки'),
+        ('BOYS', 'Мальчики'),
+        ('UNISEX', 'Унисекс'),
+    ]
+    AGE_CHOICES = [
+        ('TODDLER','Тоддлеры'),
+        ('MINI', 'Мини'),
+        ('JUNIOR', 'Джуниор'),
+        ('BASE', 'База'),
+        ('---','Не определено')
+    ]
     capsule_firstletters = models.CharField(max_length=30, default='', blank=False)
     name = models.CharField(max_length=50, default='', blank=True)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Сезон')
@@ -96,6 +107,8 @@ class Capsule(models.Model):
     rating_rel_leftovers = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_rentability = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_total = models.PositiveSmallIntegerField(default=0, editable=False)
+    gender = models.CharField(max_length=6, choices=GENDER_CHOICES, default='UNISEX')
+    age = models.CharField(max_length=7, choices=AGE_CHOICES, default='---')
 
 
     def __str__(self):
@@ -190,6 +203,29 @@ class Capsule(models.Model):
     def summ_of_ratings(self):
         return (self.rating_income + self.rating_rel_leftovers  + self.rating_rentability)
 
+    @property
+    def type_of_clothes(self):
+        clothes_type_list = ['OTHER','TSHIRT','LONGSLEEVE','SWEATSHOT','HOODY','BLOUSE','SUNDRESS','SWEATER','WINDBREAK','DENIMJACKT',
+                             'OUTERWEAR','DRESS','SPORTPANTS','PANTS','SHORTS','SKIRT','CAP','HAT','SCARF','SWIMSUIT','SOCKS',
+                             'PANTIES','TIGHTS']
+        final_dict = {}
+
+        for i in clothes_type_list:
+            percent = 0
+            summ1 = Size.objects.filter(user=self.user, sku__capsule=self.id, sku__clothes_type=i).aggregate(Sum('quantity_sold'))
+            summ2 = Size.objects.filter(user=self.user, sku__capsule=self.id, sku__clothes_type=i).aggregate(Sum('quantity_instock'))
+            q_sold = summ1['quantity_sold__sum']
+            q_instock = summ2['quantity_instock__sum']
+            if not q_sold:
+                q_sold = 0
+            if not q_instock:
+                q_instock = 0
+            if q_sold+q_instock != 0:
+                percent = round(q_sold*100/(q_sold+q_instock),1) # Процент реализации
+            final_dict[i]=[q_sold, q_instock, percent]
+
+        return final_dict
+
 
 class SKU(models.Model):
     CLOTHES_TYPE_CHOICES = [
@@ -213,7 +249,9 @@ class SKU(models.Model):
         ('HAT', 'Шапка'),
         ('SCARF', 'Шарф'),
         ('SWIMSUIT', 'Купальники и плавки'),
-        ('SOCKS', 'Носки')
+        ('SOCKS', 'Носки'),
+        ('PANTIES','Трусы'),
+        ('TIGHTS','Колготки')
 
     ]
     name = models.CharField(max_length=100, default='', blank=True)
@@ -225,7 +263,7 @@ class SKU(models.Model):
     rating_income = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_sellsumm_sold = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_quantity = models.PositiveSmallIntegerField(default=0, editable=False)
-    clothes_type = models.CharField(max_length=10, choices=CLOTHES_TYPE_CHOICES, default='--')
+    clothes_type = models.CharField(max_length=10, choices=CLOTHES_TYPE_CHOICES, default='OTHER')
 
     def __str__(self):
         return f'{self.sku_firstletters} - {self.name}'
