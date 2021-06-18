@@ -82,6 +82,18 @@ def sheet_cell(row, column):
         return sheet.cell(row=row, column=column).value
 
 
+def define_clothestype(sku_name,clothestype_configlist):
+    sku_name=sku_name.lower()
+    sku_name=sku_name.strip()
+    skuname_list = sku_name.split(' ')
+    for i in skuname_list:
+        if i in clothestype_configlist :
+            # print (sku_name,clothestype_configlist[i] )
+            return clothestype_configlist[i]
+
+    return 'OTHER'
+
+
 def handle_uploaded_file(excel_file, user_id):
     '''
     This function is parsing uploaded file and write it to database.
@@ -102,6 +114,7 @@ def handle_uploaded_file(excel_file, user_id):
     # Reading config file
     seasons_configlist = []
     capsules_configlist = []
+    clothestype_configlist = []
     error_message = ''
     seasonname_from_config = ''
     capsulename_from_config = ''
@@ -110,6 +123,8 @@ def handle_uploaded_file(excel_file, user_id):
         config.read('sku_config.ini')
         seasons_configlist = config['Seasons']
         capsules_configlist = config['Capsules']
+        clothestype_configlist = config['Clothestypes']
+
     except:
         print("Файл конфигурации 'sku_config.ini' не обнаружен. Названия коллекций могут не подгружаться.")
         return False, "Файл конфигурации 'sku_config.ini' не обнаружен."
@@ -371,10 +386,7 @@ def handle_uploaded_file(excel_file, user_id):
 
         capsule = sku_nosize[:6]
 
-        if 'футболка' in sku_name.lower():
-            clothestype='TSHIRT'
-        else:
-            clothestype='OTHER'
+        clothestype = define_clothestype(sku_name, clothestype_configlist)
 
         # Add Season
         if season not in seasons_checklist:
