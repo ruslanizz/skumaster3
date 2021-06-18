@@ -3,6 +3,32 @@ from django.conf import settings
 from django.db.models import Sum
 from products.godzilla import build_sizes_grid
 
+CLOTHES_TYPE_CHOICES = [
+    ('OTHER', 'Остальное'),
+    ('TSHIRT', 'Футболка с коротким рукавом'),
+    ('LONGSLEEVE', 'Футболка с длинным рукавом'),
+    ('SWEATSHOT', 'Толстовка нераспашная'),
+    ('HOODY', 'Толстовка распашная'),
+    ('BLOUSE', 'Блузка'),
+    ('SUNDRESS', 'Сарафан'),
+    ('SWEATER', 'Кардиганы, джемперы, свитера'),
+    ('WINDBREAK', 'Ветровка'),
+    ('DENIMJACKT', 'Джинсовая куртка'),
+    ('OUTERWEAR', 'Верхняя одежда'),
+    ('DRESS', 'Платье'),
+    ('SPORTPANTS', 'Спортивные брюки'),
+    ('PANTS', 'Брюки'),
+    ('SHORTS', 'Шорты'),
+    ('SKIRT', 'Юбка'),
+    ('CAP', 'Бейсболка'),
+    ('HAT', 'Шапка'),
+    ('SCARF', 'Шарф'),
+    ('SWIMSUIT', 'Купальники и плавки'),
+    ('SOCKS', 'Носки'),
+    ('PANTIES', 'Трусы'),
+    ('TIGHTS', 'Колготки')
+
+]
 
 class UploadedBaseInfo(models.Model):
     period = models.CharField(max_length=100, default='', blank=True)
@@ -205,15 +231,13 @@ class Capsule(models.Model):
 
     @property
     def type_of_clothes(self):
-        clothes_type_list = ['OTHER','TSHIRT','LONGSLEEVE','SWEATSHOT','HOODY','BLOUSE','SUNDRESS','SWEATER','WINDBREAK','DENIMJACKT',
-                             'OUTERWEAR','DRESS','SPORTPANTS','PANTS','SHORTS','SKIRT','CAP','HAT','SCARF','SWIMSUIT','SOCKS',
-                             'PANTIES','TIGHTS']
+
         final_dict = {}
 
-        for i in clothes_type_list:
+        for i in CLOTHES_TYPE_CHOICES:
             percent = 0
-            summ1 = Size.objects.filter(user=self.user, sku__capsule=self.id, sku__clothes_type=i).aggregate(Sum('quantity_sold'))
-            summ2 = Size.objects.filter(user=self.user, sku__capsule=self.id, sku__clothes_type=i).aggregate(Sum('quantity_instock'))
+            summ1 = Size.objects.filter(user=self.user, sku__capsule=self.id, sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
+            summ2 = Size.objects.filter(user=self.user, sku__capsule=self.id, sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
             q_sold = summ1['quantity_sold__sum']
             q_instock = summ2['quantity_instock__sum']
             if not q_sold:
@@ -222,38 +246,13 @@ class Capsule(models.Model):
                 q_instock = 0
             if q_sold+q_instock != 0:
                 percent = round(q_sold*100/(q_sold+q_instock),1) # Процент реализации
-            final_dict[i]=[q_sold, q_instock, percent]
+            final_dict[i[0]]=[q_sold, q_instock, percent]
 
         return final_dict
 
 
 class SKU(models.Model):
-    CLOTHES_TYPE_CHOICES = [
-        ('OTHER', 'Остальное'),
-        ('TSHIRT', 'Футболка с коротким рукавом'),
-        ('LONGSLEEVE', 'Футболка с длинным рукавом'),
-        ('SWEATSHOT', 'Толстовка нераспашная'),
-        ('HOODY', 'Толстовка распашная'),
-        ('BLOUSE', 'Блузка'),
-        ('SUNDRESS', 'Сарафан'),
-        ('SWEATER', 'Кардиганы, джемперы, свитера'),
-        ('WINDBREAK', 'Ветровка'),
-        ('DENIMJACKT', 'Джинсовая куртка'),
-        ('OUTERWEAR', 'Верхняя одежда'),
-        ('DRESS', 'Платье'),
-        ('SPORTPANTS', 'Спортивные брюки'),
-        ('PANTS', 'Брюки'),
-        ('SHORTS', 'Шорты'),
-        ('SKIRT','Юбка'),
-        ('CAP', 'Бейсболка'),
-        ('HAT', 'Шапка'),
-        ('SCARF', 'Шарф'),
-        ('SWIMSUIT', 'Купальники и плавки'),
-        ('SOCKS', 'Носки'),
-        ('PANTIES','Трусы'),
-        ('TIGHTS','Колготки')
 
-    ]
     name = models.CharField(max_length=100, default='', blank=True)
     sku_firstletters = models.CharField(max_length=15, default='', blank=False)
     capsule = models.ForeignKey(Capsule, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Капсула')

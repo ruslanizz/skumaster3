@@ -27,7 +27,7 @@
                </div>
            </div>
           <div class = "col">
-                  <a href="/open" role="button" class="btn btn-primary">
+                  <a :href="'/analytics/?season='+capsules_data[0].season" role="button" class="btn btn-primary">
                    <i class="bi bi-calculator-fill" style="font-size: 1rem;"></i>
                      &nbsp Аналитика
                 </a>
@@ -169,7 +169,7 @@
                         <hr class="border-1 border-white mx-5"/>
                         Тип: Продано / В остатке / Процент реализации <br>
                         <div v-for= "(value, key) in i.type_of_clothes">
-                            <div v-if="value[0] != 0 && value[1] != 0">
+                            <div v-if="value[2] != 0">
                                 {{key}} {{value}}
                             </div>
                         </div>
@@ -215,7 +215,6 @@
 
 <script src="/static/capsules_app.js"></script>
 
-</body>
-</html>
+
 
 {% endblock %}

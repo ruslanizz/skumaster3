@@ -1,0 +1,39 @@
+{% extends 'index.html' %}
+
+{% block my_content %}
+
+
+{% verbatim %}
+
+
+<div class="jumbotron">
+  <h1 class="display-5">Аналитика по сезону</h1>
+  <p class="lead">
+    По сезону аналитика
+  </p>
+
+<div class="container" id="analyticsapp">
+
+<!--    Сезон: {{capsules_data[0].get_season_name}}-->
+
+    <div v-for="i in capsules_data"> {{i}} <br></div>
+
+
+
+</div>
+
+</div>
+<br>
+<br>
+{% endverbatim %}
+
+<script>
+// Выделяем из адресной строки номер сезона
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const season_number = urlParams.get('season')
+
+</script>
+
+<script src="/static/analytics_app.js"></script>
+{% endblock %}

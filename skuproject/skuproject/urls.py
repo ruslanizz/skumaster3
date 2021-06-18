@@ -25,6 +25,7 @@ router = SimpleRouter()
 router.register('api/seasons', SeasonsView, basename='seasons')
 router.register('api/baseinfo', UploadedBaseInfoView)
 router.register('api/capsules', CapsulesView, basename='capsules')
+router.register('api/analytics', CapsulesView)
 router.register('api/sku', SkuView, basename='sku')
 
 urlpatterns = [
@@ -36,7 +37,8 @@ urlpatterns = [
     path('sku/', sku_page),
     path('capsules/', capsules_page),
     path('accounts/', include('users.urls')),
-    path('accounts/', include('django.contrib.auth.urls'))
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('analytics/', analytics_page)
 
 ]
 

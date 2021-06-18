@@ -135,3 +135,9 @@ def onway_page(request):
             return render(request, 'onway.html', {'message': error_message})
 
     return render(request, 'onway.html')
+
+
+def analytics_page(request):
+    return render(request, 'analytics.html')
+
+
