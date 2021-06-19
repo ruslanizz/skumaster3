@@ -100,12 +100,46 @@ class Season(models.Model):
             return 0
         return round(((self.capsules_sellsumm_sold / (self.capsules_sellsumm_sold - self.capsules_income)) * 100) - 100)
 
-    # @property
-    # def set_capsules_ratings(self):
-    #     if Capsule.objects.filter(user=self.user, season=self.id, rating__gt=0).exists():
-    #         pass
-    #     else:
+    @property
+    def analytics_girls_mini(self):
+        final_dict = {}
+        for i in CLOTHES_TYPE_CHOICES:
+            percent=0
+            summ1 = Size.objects.filter(user=self.user,
+                                   sku__capsule__season=self.id,
+                                   sku__capsule__gender='GIRLS',
+                                   sku__capsule__age='MINI',
+                                   sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
 
+            summ2 = Size.objects.filter(user=self.user,
+                                   sku__capsule__season=self.id,
+                                   sku__capsule__gender='GIRLS',
+                                   sku__capsule__age='MINI',
+                                   sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
+
+            q_sold = summ1['quantity_sold__sum']
+            q_instock = summ2['quantity_instock__sum']
+            if not q_sold:
+                q_sold = 0
+            if not q_instock:
+                q_instock = 0
+            if q_sold+q_instock != 0:
+                percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
+                final_dict[i[1]]=[q_sold, q_instock, percent]
+
+        # summ_sold = 0
+        # summ_instock = 0
+        # percent_total = 0
+        # for k,v in final_dict.items():
+        #     summ_sold += v[0]
+        #     summ_instock += v[1]
+        #
+        # if summ_sold + summ_instock != 0:
+        #     percent_total = round(summ_sold * 100 / (summ_sold + summ_instock))  # Процент реализации
+        #
+        # final_dict['Итого'] = [summ_sold,summ_instock,percent_total]
+
+        return final_dict
 
 
 class Capsule(models.Model):
@@ -244,21 +278,22 @@ class Capsule(models.Model):
             if not q_instock:
                 q_instock = 0
             if q_sold+q_instock != 0:
-                percent = round(q_sold*100/(q_sold+q_instock),1) # Процент реализации
-            final_dict[i[1]]=[q_sold, q_instock, percent]
+                percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
+                final_dict[i[1]]=[q_sold, q_instock, percent]
+
+        summ_sold = 0
+        summ_instock = 0
+        percent_total = 0
+        for k,v in final_dict.items():
+            summ_sold += v[0]
+            summ_instock += v[1]
+
+        if summ_sold + summ_instock != 0:
+            percent_total = round(summ_sold * 100 / (summ_sold + summ_instock))  # Процент реализации
+
+        final_dict['Итого'] = [summ_sold,summ_instock,percent_total]
 
         return final_dict
-
-
-    # @property
-    # def analytics_by_age_and_gender(self):
-    #     work_dict = self.type_of_clothes
-    #     summ = [x['type_of_clothes'] if x['age']=='MINI' and x['gender']=='GIRLS' for x in work_dict]
-    #
-    #
-    #     return
-
-
 
 
 class SKU(models.Model):

@@ -215,6 +215,10 @@
                     Наценка: {{i.capsules_margin_percent}} %
                     <hr class="border-1 border-white mx-5"/>
                     Остатки (закуп.): {{i.capsules_costsumm_instock | format }} р.
+                    <br>
+                    <div v-for = "(v,k) in i.analytics_girls_mini">
+                        {{k}} - {{v}}
+                    </div>
                 </div>
             </div>
             <br>

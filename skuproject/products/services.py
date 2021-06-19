@@ -522,6 +522,11 @@ def handle_uploaded_file(excel_file, user_id):
     SKU.objects.bulk_create(sku_list)
     Size.objects.bulk_create(size_list)
 
+    # # And finally, lets give a rating
+    # for _season in Season.objects.filter(user=user_id):
+    #     queryset=Capsule.objects.filter(user=user_id, season=_season.id).order_by('sku_income')
+
+
     return True, error_message
 
 

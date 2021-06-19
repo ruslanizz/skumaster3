@@ -18,7 +18,7 @@
     <h1>Сезон: {{capsules_data[0].get_season_name}}</h1>
 
 <div class="container">
-    <div v-for="i in capsules_data">
+    <div v-for="i in sortedCapsulesData">
 
        <h5> {{i.name}}
        <span class="badge badge-info">{{i.gender}}</span>
@@ -38,12 +38,13 @@
 
 
           <tbody>
-            <tr v-for = "(v,k) in i.type_of_clothes" v-if="v[2] != 0">
+            <tr v-for = "(v,k) in i.type_of_clothes">
 
-                      <th scope="row" style = font-weight:normal> {{k}} </th>
+                <th v-if="k != 'Итого'" scope="row" style = font-weight:normal > {{k}} </th>
+                <th v-else scope="row" > {{k}} </th>
 
-                      <td>{{v[0]}}</td>
-                      <td>{{v[1]}}</td>
+                <td>{{v[0]}}</td>
+                <td>{{v[1]}}</td>
                 <td v-if="v[2] > 75"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>
@@ -60,8 +61,30 @@
         <br>
     </div>
 
+
+
+
+ <div class="container">
+     <h1>Итого по половозрастным группам</h1>
+     ДЕВОЧКИ МИНИ
+    <div v-for="j in season_data">
+
+        <div v-for="(v,k) in j.analytics_girls_mini">
+            {{k}} : {{v}}
+        </div>
+
+    </div>
+
+ </div>
+
+
+
+
+
 </div>
-</div>
+
+
+
 </div>
 <br>
 <br>

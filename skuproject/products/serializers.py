@@ -15,7 +15,8 @@ class SeasonSerializer(ModelSerializer):
                   'capsules_costsumm_sold',
                   'capsules_income',
                   'capsules_costsumm_instock',
-                  'capsules_margin_percent'
+                  'capsules_margin_percent',
+                  'analytics_girls_mini'
                   ]
 
 
@@ -123,5 +124,6 @@ class AnalyticsSeasonSerializer(ModelSerializer):
                   'capsules_costsumm_sold',
                   'capsules_income',
                   'capsules_costsumm_instock',
-                  'capsules_margin_percent'
+                  'capsules_margin_percent',
+                  'analytics_girls_mini'
                   ]
