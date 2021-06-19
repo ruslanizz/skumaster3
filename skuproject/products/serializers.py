@@ -44,7 +44,6 @@ class CapsuleSerializer(ModelSerializer):
                   'rating_rel_leftovers',
                   'relative_leftovers',
                   'rating_total',
-                  'type_of_clothes', # переименовать, это количество футболок и т п
                   'gender',
                   'age'
                           ]
@@ -86,3 +85,33 @@ class SkuSerializer(ModelSerializer):
                   'clothes_type'
                   ]
 
+
+class AnalyticsSerializer(ModelSerializer):
+    class Meta:
+        model = Capsule
+        fields = ['name',
+                  'id',
+                  'season',
+                  'img',
+                  'capsule_firstletters',
+                  'user',
+                  'sku_quantity',
+                  'sku_sellsumm_sold',
+                  'sku_costsumm_sold',
+                  'sku_costsumm_instock',
+                  'sku_income',
+                  'sku_margin_percent',
+                  'get_season_name',
+                  'sold_sizes_forchart',
+                  'sizes_sold_quantity',
+                  'sizes_instock_quantity',
+                  'rentability',
+                  'rating_rentability',
+                  'rating_income',
+                  'rating_rel_leftovers',
+                  'relative_leftovers',
+                  'rating_total',
+                  'type_of_clothes', # переименовать, это количество футболок и т п
+                  'gender',
+                  'age'
+                          ]

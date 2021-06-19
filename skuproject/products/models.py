@@ -4,7 +4,6 @@ from django.db.models import Sum
 from products.godzilla import build_sizes_grid
 
 CLOTHES_TYPE_CHOICES = [
-    ('OTHER', 'Остальное'),
     ('TSHIRT', 'Футболка с коротким рукавом'),
     ('LONGSLEEVE', 'Футболка с длинным рукавом'),
     ('SWEATSHOT', 'Толстовка нераспашная'),
@@ -26,8 +25,8 @@ CLOTHES_TYPE_CHOICES = [
     ('SWIMSUIT', 'Купальники и плавки'),
     ('SOCKS', 'Носки'),
     ('PANTIES', 'Трусы'),
-    ('TIGHTS', 'Колготки')
-
+    ('TIGHTS', 'Колготки'),
+    ('OTHER', 'Остальное')
 ]
 
 class UploadedBaseInfo(models.Model):
@@ -246,7 +245,7 @@ class Capsule(models.Model):
                 q_instock = 0
             if q_sold+q_instock != 0:
                 percent = round(q_sold*100/(q_sold+q_instock),1) # Процент реализации
-            final_dict[i[0]]=[q_sold, q_instock, percent]
+            final_dict[i[1]]=[q_sold, q_instock, percent]
 
         return final_dict
 
