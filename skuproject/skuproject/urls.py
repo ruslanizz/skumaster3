@@ -25,7 +25,8 @@ router = SimpleRouter()
 router.register('api/seasons', SeasonsView, basename='seasons')
 router.register('api/baseinfo', UploadedBaseInfoView)
 router.register('api/capsules', CapsulesView, basename='capsules')
-router.register('api/analytics', AnalyticsView, basename='analytics')
+router.register('api/analytics', AnalyticsCapsuleView, basename='analytics')
+router.register('api/analytics_season', AnalyticsSeasonView, basename='analytics_season')
 router.register('api/sku', SkuView, basename='sku')
 
 urlpatterns = [

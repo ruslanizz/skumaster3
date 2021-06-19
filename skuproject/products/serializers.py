@@ -86,7 +86,7 @@ class SkuSerializer(ModelSerializer):
                   ]
 
 
-class AnalyticsSerializer(ModelSerializer):
+class AnalyticsCapsuleSerializer(ModelSerializer):
     class Meta:
         model = Capsule
         fields = ['name',
@@ -102,16 +102,26 @@ class AnalyticsSerializer(ModelSerializer):
                   'sku_income',
                   'sku_margin_percent',
                   'get_season_name',
-                  'sold_sizes_forchart',
                   'sizes_sold_quantity',
                   'sizes_instock_quantity',
-                  'rentability',
-                  'rating_rentability',
-                  'rating_income',
-                  'rating_rel_leftovers',
-                  'relative_leftovers',
-                  'rating_total',
                   'type_of_clothes', # переименовать, это количество футболок и т п
                   'gender',
                   'age'
                           ]
+
+
+class AnalyticsSeasonSerializer(ModelSerializer):
+    class Meta:
+        model = Season
+        fields = ['name',
+                  'id',
+                  'img',
+                  'season_firstletters',
+                  'user',
+                  'capsules_quantity',
+                  'capsules_sellsumm_sold',
+                  'capsules_costsumm_sold',
+                  'capsules_income',
+                  'capsules_costsumm_instock',
+                  'capsules_margin_percent'
+                  ]

@@ -250,6 +250,17 @@ class Capsule(models.Model):
         return final_dict
 
 
+    # @property
+    # def analytics_by_age_and_gender(self):
+    #     work_dict = self.type_of_clothes
+    #     summ = [x['type_of_clothes'] if x['age']=='MINI' and x['gender']=='GIRLS' for x in work_dict]
+    #
+    #
+    #     return
+
+
+
+
 class SKU(models.Model):
 
     name = models.CharField(max_length=100, default='', blank=True)

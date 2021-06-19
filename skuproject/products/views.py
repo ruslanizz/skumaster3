@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from products.models import UploadedBaseInfo, Season, Capsule, SKU
-from products.serializers import UploadedBaseInfoSerializer, SeasonSerializer, CapsuleSerializer, SkuSerializer, AnalyticsSerializer
+from products.serializers import UploadedBaseInfoSerializer, SeasonSerializer, CapsuleSerializer, SkuSerializer, \
+    AnalyticsCapsuleSerializer, AnalyticsSeasonSerializer
 from products.services import handle_uploaded_file, upload_onway_bill, set_sku_ratings, set_capsule_ratings, \
     set_total_rating
 
@@ -141,9 +142,9 @@ def analytics_page(request):
     return render(request, 'analytics.html')
 
 
-class AnalyticsView(ModelViewSet):
+class AnalyticsCapsuleView(ModelViewSet):
     queryset = Capsule.objects.all()
-    serializer_class = AnalyticsSerializer
+    serializer_class = AnalyticsCapsuleSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -157,3 +158,17 @@ class AnalyticsView(ModelViewSet):
         return query_set
 
 
+class AnalyticsSeasonView(ModelViewSet):
+    queryset = Season.objects.all()
+    serializer_class = AnalyticsSeasonSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Override method to get filtered queryset
+        """
+        query_set = self.queryset
+        param = self.request.query_params.get('season', None)
+        if param is not None:
+            query_set = query_set.filter(season=param, user=self.request.user)
+        return query_set

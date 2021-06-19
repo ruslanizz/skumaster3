@@ -6,7 +6,7 @@
 {% verbatim %}
 
 
-<div class="jumbotron">
+<div class="container">
   <h1 class="display-5">Аналитика по сезону</h1>
   <p class="lead">
     Аналитику считайте в конце сезона, причем загрузите данные с самого начала продаж. <br>
@@ -21,45 +21,42 @@
     <div v-for="i in capsules_data">
 
        <h5> {{i.name}}
-       <span class="badge badge-light">{{i.gender}}</span>
-       <span class="badge badge-light" v-if="i.age != '---'">{{i.age}}</span>
+       <span class="badge badge-info">{{i.gender}}</span>
+       <span class="badge badge-info" v-if="i.age != '---'">{{i.age}}</span>
        </h5>
 
 <!--<img :src="i.img" v-if="i.img" /> -->
-        <div class="row">
-            <div class="col"> Группа </div>
-            <div class="col"> Продано, шт. </div>
-            <div class="col"> Остаток, шт. </div>
-            <div class="col"> Процент реализации </div>
-        </div>
-                        <hr class="border-1 border-black mx-5"/>
-
-            <div v-for = "(value,key) in i.type_of_clothes">
-
-                <div v-if="value[2] != 0">
-                <div class="row" >
-                    <div class="col">
-                        {{key}}
-                    </div>
-                    <div class="col">
-                        {{value[0]}}
-                    </div>
-                    <div class="col">
-                        {{value[1]}}
-                    </div>
-                    <div class="col">
-                        {{value[2]}} %
-                    </div>
-
-                </div>
-
-                </div>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Группа</th>
+              <th scope="col">Продано, шт.</th>
+              <th scope="col">Остаток, шт.</th>
+              <th scope="col">Процент реализации</th>
+            </tr>
+          </thead>
 
 
-             </div>
+          <tbody>
+            <tr v-for = "(v,k) in i.type_of_clothes" v-if="v[2] != 0">
+
+                      <th scope="row" style = font-weight:normal> {{k}} </th>
+
+                      <td>{{v[0]}}</td>
+                      <td>{{v[1]}}</td>
+                <td v-if="v[2] > 75"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>
+                <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>
+                <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>
+                <td v-else> {{v[2]}} % </td>
 
 
-<!--                <hr class="border-2 border-black mx-5"/>-->
+                </tr>
+            </div>
+          </tbody>
+
+        </table>
+
+
         <br>
     </div>
 
