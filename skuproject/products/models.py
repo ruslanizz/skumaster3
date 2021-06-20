@@ -29,6 +29,20 @@ CLOTHES_TYPE_CHOICES = [
     ('OTHER', 'Остальное')
 ]
 
+AGE_CHOICES = [
+    ('TODDLER', 'Тоддлеры'),
+    ('MINI', 'Мини'),
+    ('JUNIOR', 'Джуниор'),
+    ('BASE', 'База'),
+    ('---', 'Не определено')
+]
+
+GENDER_CHOICES = [
+    ('GIRLS', 'Девочки'),
+    ('BOYS', 'Мальчики'),
+    ('UNISEX', 'Унисекс'),
+]
+
 class UploadedBaseInfo(models.Model):
     period = models.CharField(max_length=100, default='', blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
@@ -100,61 +114,103 @@ class Season(models.Model):
             return 0
         return round(((self.capsules_sellsumm_sold / (self.capsules_sellsumm_sold - self.capsules_income)) * 100) - 100)
 
+    # @property
+    # def analytics_girls_mini(self):
+    #     final_dict = {}
+    #     for i in CLOTHES_TYPE_CHOICES:
+    #         percent=0
+    #         summ1 = Size.objects.filter(user=self.user,
+    #                                sku__capsule__season=self.id,
+    #                                sku__capsule__gender='GIRLS',
+    #                                sku__capsule__age='MINI',
+    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
+    #
+    #         summ2 = Size.objects.filter(user=self.user,
+    #                                sku__capsule__season=self.id,
+    #                                sku__capsule__gender='GIRLS',
+    #                                sku__capsule__age='MINI',
+    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
+    #
+    #         q_sold = summ1['quantity_sold__sum']
+    #         q_instock = summ2['quantity_instock__sum']
+    #         if not q_sold:
+    #             q_sold = 0
+    #         if not q_instock:
+    #             q_instock = 0
+    #         if q_sold+q_instock != 0:
+    #             percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
+    #             final_dict[i[1]]=[q_sold, q_instock, percent]
+    #
+    #     return final_dict
+    #
+    #
+    # @property
+    # def analytics_boys_mini(self):
+    #     final_dict = {}
+    #     for i in CLOTHES_TYPE_CHOICES:
+    #         percent=0
+    #         summ1 = Size.objects.filter(user=self.user,
+    #                                sku__capsule__season=self.id,
+    #                                sku__capsule__gender='BOYS',
+    #                                sku__capsule__age='MINI',
+    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
+    #
+    #         summ2 = Size.objects.filter(user=self.user,
+    #                                sku__capsule__season=self.id,
+    #                                sku__capsule__gender='BOYS',
+    #                                sku__capsule__age='MINI',
+    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
+    #
+    #         q_sold = summ1['quantity_sold__sum']
+    #         q_instock = summ2['quantity_instock__sum']
+    #         if not q_sold:
+    #             q_sold = 0
+    #         if not q_instock:
+    #             q_instock = 0
+    #         if q_sold+q_instock != 0:
+    #             percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
+    #             final_dict[i[1]]=[q_sold, q_instock, percent]
+    #
+    #     return final_dict
+
     @property
-    def analytics_girls_mini(self):
-        final_dict = {}
-        for i in CLOTHES_TYPE_CHOICES:
-            percent=0
-            summ1 = Size.objects.filter(user=self.user,
-                                   sku__capsule__season=self.id,
-                                   sku__capsule__gender='GIRLS',
-                                   sku__capsule__age='MINI',
-                                   sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
+    def analytics_gender_age(self):
+        superfinal_dict = {}
+        for gender in GENDER_CHOICES:
+            for age in AGE_CHOICES:
+                final_dict = {}
+                for i in CLOTHES_TYPE_CHOICES:
+                    percent=0
+                    summ1 = Size.objects.filter(user=self.user,
+                                           sku__capsule__season=self.id,
+                                           sku__capsule__gender=gender[0],
+                                           sku__capsule__age=age[0],
+                                           sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
 
-            summ2 = Size.objects.filter(user=self.user,
-                                   sku__capsule__season=self.id,
-                                   sku__capsule__gender='GIRLS',
-                                   sku__capsule__age='MINI',
-                                   sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
+                    summ2 = Size.objects.filter(user=self.user,
+                                           sku__capsule__season=self.id,
+                                           sku__capsule__gender=gender[0],
+                                           sku__capsule__age=age[0],
+                                           sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
 
-            q_sold = summ1['quantity_sold__sum']
-            q_instock = summ2['quantity_instock__sum']
-            if not q_sold:
-                q_sold = 0
-            if not q_instock:
-                q_instock = 0
-            if q_sold+q_instock != 0:
-                percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
-                final_dict[i[1]]=[q_sold, q_instock, percent]
+                    q_sold = summ1['quantity_sold__sum']
+                    q_instock = summ2['quantity_instock__sum']
+                    if not q_sold:
+                        q_sold = 0
+                    if not q_instock:
+                        q_instock = 0
+                    if q_sold+q_instock != 0:
+                        percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
+                        final_dict[i[1]]=[q_sold, q_instock, percent]
+                if final_dict:
+                    gender_age_str = gender[1] + ' ' + age[1]
+                    superfinal_dict[gender_age_str] = final_dict
 
-        # summ_sold = 0
-        # summ_instock = 0
-        # percent_total = 0
-        # for k,v in final_dict.items():
-        #     summ_sold += v[0]
-        #     summ_instock += v[1]
-        #
-        # if summ_sold + summ_instock != 0:
-        #     percent_total = round(summ_sold * 100 / (summ_sold + summ_instock))  # Процент реализации
-        #
-        # final_dict['Итого'] = [summ_sold,summ_instock,percent_total]
-
-        return final_dict
+        return superfinal_dict
 
 
 class Capsule(models.Model):
-    GENDER_CHOICES = [
-        ('GIRLS','Девочки'),
-        ('BOYS', 'Мальчики'),
-        ('UNISEX', 'Унисекс'),
-    ]
-    AGE_CHOICES = [
-        ('TODDLER','Тоддлеры'),
-        ('MINI', 'Мини'),
-        ('JUNIOR', 'Джуниор'),
-        ('BASE', 'База'),
-        ('---','Не определено')
-    ]
+
     capsule_firstletters = models.CharField(max_length=30, default='', blank=False)
     name = models.CharField(max_length=50, default='', blank=True)
     season = models.ForeignKey(Season, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Сезон')

@@ -153,7 +153,6 @@ class AnalyticsCapsuleView(ModelViewSet):
         """
         query_set = self.queryset
         param = self.request.query_params.get('season', None)
-        print('===========', param)
         if param is not None:
             query_set = query_set.filter(season=param, user=self.request.user)
         return query_set
@@ -170,7 +169,6 @@ class AnalyticsSeasonView(ModelViewSet):
         """
         query_set = self.queryset
         param = self.request.query_params.get('id', None)
-        print('###########', param)
         if param is not None:
             query_set = query_set.filter(id=param, user=self.request.user)
         return query_set

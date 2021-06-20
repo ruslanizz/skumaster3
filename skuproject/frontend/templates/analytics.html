@@ -45,7 +45,7 @@
 
                 <td>{{v[0]}}</td>
                 <td>{{v[1]}}</td>
-                <td v-if="v[2] > 75"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>
+                <td v-if="v[2] > 79"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>
                 <td v-else> {{v[2]}} % </td>
@@ -66,15 +66,65 @@
 
  <div class="container">
      <h1>Итого по половозрастным группам</h1>
-     ДЕВОЧКИ МИНИ
-    <div v-for="j in season_data">
+     <div v-for = "(value,key) in season_data[0].analytics_gender_age">
+     <h2>{{key}}</h2>
+         <table class="table table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Группа</th>
+              <th scope="col">Продано, шт.</th>
+              <th scope="col">Остаток, шт.</th>
+              <th scope="col">Процент реализации</th>
+            </tr>
+          </thead>
 
-        <div v-for="(v,k) in j.analytics_girls_mini">
-            {{k}} : {{v}}
-        </div>
+          <tbody>
+            <tr v-for = "(v,k) in value">
+                <th scope="row" style = font-weight:normal > {{k}} </th>
 
-    </div>
+                <td>{{v[0]}}</td>
+                <td>{{v[1]}}</td>
+                <td v-if="v[2] > 79"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>
+                <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>
+                <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>
+                <td v-else> {{v[2]}} % </td>
 
+            </tr>
+
+          </tbody>
+
+        </table>
+
+<!--     <h2>МАЛЬЧИКИ МИНИ</h2>-->
+
+<!--         <table class="table table-sm">-->
+<!--          <thead>-->
+<!--            <tr>-->
+<!--              <th scope="col">Группа</th>-->
+<!--              <th scope="col">Продано, шт.</th>-->
+<!--              <th scope="col">Остаток, шт.</th>-->
+<!--              <th scope="col">Процент реализации</th>-->
+<!--            </tr>-->
+<!--          </thead>-->
+
+<!--          <tbody>-->
+<!--            <tr v-for = "(v,k) in season_data[0].analytics_boys_mini">-->
+<!--                <th v-if="k != 'Итого'" scope="row" style = font-weight:normal > {{k}} </th>-->
+<!--                <th v-else scope="row" > {{k}} </th>-->
+
+<!--                <td>{{v[0]}}</td>-->
+<!--                <td>{{v[1]}}</td>-->
+<!--                <td v-if="v[2] > 79"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>-->
+<!--                <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>-->
+<!--                <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>-->
+<!--                <td v-else> {{v[2]}} % </td>-->
+
+<!--            </tr>-->
+
+<!--          </tbody>-->
+
+<!--        </table>-->
+ </div>
  </div>
 
 
