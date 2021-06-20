@@ -6,8 +6,8 @@ from products.godzilla import build_sizes_grid
 CLOTHES_TYPE_CHOICES = [
     ('TSHIRT', 'Футболка с коротким рукавом'),
     ('LONGSLEEVE', 'Футболка с длинным рукавом'),
-    ('SWEATSHOT', 'Толстовка нераспашная'),
-    ('HOODY', 'Толстовка распашная'),
+    ('SPORTHOODY', 'Спортивная толстовка'),
+    ('HOODY', 'Толстовка'),
     ('BLOUSE', 'Блузка'),
     ('SUNDRESS', 'Сарафан'),
     ('SWEATER', 'Кардиганы, джемперы, свитера'),
@@ -17,6 +17,7 @@ CLOTHES_TYPE_CHOICES = [
     ('DRESS', 'Платье'),
     ('SPORTPANTS', 'Спортивные брюки'),
     ('PANTS', 'Брюки'),
+    ('JEANS','Джинсы'),
     ('SHORTS', 'Шорты'),
     ('SKIRT', 'Юбка'),
     ('CAP', 'Бейсболка'),
@@ -113,65 +114,6 @@ class Season(models.Model):
         if (self.capsules_sellsumm_sold - self.capsules_income) == 0:
             return 0
         return round(((self.capsules_sellsumm_sold / (self.capsules_sellsumm_sold - self.capsules_income)) * 100) - 100)
-
-    # @property
-    # def analytics_girls_mini(self):
-    #     final_dict = {}
-    #     for i in CLOTHES_TYPE_CHOICES:
-    #         percent=0
-    #         summ1 = Size.objects.filter(user=self.user,
-    #                                sku__capsule__season=self.id,
-    #                                sku__capsule__gender='GIRLS',
-    #                                sku__capsule__age='MINI',
-    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
-    #
-    #         summ2 = Size.objects.filter(user=self.user,
-    #                                sku__capsule__season=self.id,
-    #                                sku__capsule__gender='GIRLS',
-    #                                sku__capsule__age='MINI',
-    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
-    #
-    #         q_sold = summ1['quantity_sold__sum']
-    #         q_instock = summ2['quantity_instock__sum']
-    #         if not q_sold:
-    #             q_sold = 0
-    #         if not q_instock:
-    #             q_instock = 0
-    #         if q_sold+q_instock != 0:
-    #             percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
-    #             final_dict[i[1]]=[q_sold, q_instock, percent]
-    #
-    #     return final_dict
-    #
-    #
-    # @property
-    # def analytics_boys_mini(self):
-    #     final_dict = {}
-    #     for i in CLOTHES_TYPE_CHOICES:
-    #         percent=0
-    #         summ1 = Size.objects.filter(user=self.user,
-    #                                sku__capsule__season=self.id,
-    #                                sku__capsule__gender='BOYS',
-    #                                sku__capsule__age='MINI',
-    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_sold'))
-    #
-    #         summ2 = Size.objects.filter(user=self.user,
-    #                                sku__capsule__season=self.id,
-    #                                sku__capsule__gender='BOYS',
-    #                                sku__capsule__age='MINI',
-    #                                sku__clothes_type=i[0]).aggregate(Sum('quantity_instock'))
-    #
-    #         q_sold = summ1['quantity_sold__sum']
-    #         q_instock = summ2['quantity_instock__sum']
-    #         if not q_sold:
-    #             q_sold = 0
-    #         if not q_instock:
-    #             q_instock = 0
-    #         if q_sold+q_instock != 0:
-    #             percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
-    #             final_dict[i[1]]=[q_sold, q_instock, percent]
-    #
-    #     return final_dict
 
     @property
     def analytics_gender_age(self):

@@ -115,6 +115,7 @@ def handle_uploaded_file(excel_file, user_id):
     capsules_configlist = []
     clothestype_configlist = []
     age_configlist= []
+    exceptions_configlist=[]
     error_message = ''
     seasonname_from_config = ''
     capsulename_from_config = ''
@@ -132,6 +133,8 @@ def handle_uploaded_file(excel_file, user_id):
         clothestype_configlist = config['Clothestypes']
     if 'Age' in config.sections():
         age_configlist = config['Age']
+    if 'Exceptions' in config.sections():
+        exceptions_configlist = config['Exceptions']
 
     # Reading Excel file
     try:
@@ -407,7 +410,10 @@ def handle_uploaded_file(excel_file, user_id):
             age = '---'
 
         ### CLOTHES TYPE ###
-        clothestype = define_clothestype(sku_name, clothestype_configlist)
+        if sku_nosize in exceptions_configlist:
+            clothestype = exceptions_configlist[sku_nosize]
+        else:
+            clothestype = define_clothestype(sku_name, clothestype_configlist)
 
         # Add Season
         if season not in seasons_checklist:
