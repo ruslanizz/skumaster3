@@ -114,6 +114,7 @@ def handle_uploaded_file(excel_file, user_id):
     seasons_configlist = []
     capsules_configlist = []
     clothestype_configlist = []
+    school_clothestype_configlist = []
     age_configlist= []
     exceptions_configlist=[]
     error_message = ''
@@ -135,6 +136,8 @@ def handle_uploaded_file(excel_file, user_id):
         age_configlist = config['Age']
     if 'Exceptions' in config.sections():
         exceptions_configlist = config['Exceptions']
+    if 'School Clothestypes' in config.sections():
+        school_clothestype_configlist = config['School Clothestypes']
 
     # Reading Excel file
     try:
@@ -412,6 +415,8 @@ def handle_uploaded_file(excel_file, user_id):
         ### CLOTHES TYPE ###
         if sku_nosize in exceptions_configlist:
             clothestype = exceptions_configlist[sku_nosize]
+        elif sku_nosize[3:5].lower() == 'gs':
+            clothestype = define_clothestype(sku_name, school_clothestype_configlist)
         else:
             clothestype = define_clothestype(sku_name, clothestype_configlist)
 
