@@ -25,13 +25,14 @@
        <span class="badge badge-info" v-if="i.age != '---'">{{i.age}}</span>
        </h5>
 
-<!--<img :src="i.img" v-if="i.img" /> -->
+<!--<img :src="i.img" v-if="i.img" />-->
         <table class="table table-sm">
-          <thead>
+          <thead class="thead-light">
             <tr>
               <th scope="col">Группа</th>
               <th scope="col">Продано, шт.</th>
               <th scope="col">Остаток, шт.</th>
+              <th scope="col">Всего, шт.</th>
               <th scope="col">Процент реализации</th>
             </tr>
           </thead>
@@ -40,11 +41,19 @@
           <tbody>
             <tr v-for = "(v,k) in i.type_of_clothes">
 
-                <th v-if="k != 'Итого'" scope="row" style = font-weight:normal > {{k}} </th>
-                <th v-else scope="row" > {{k}} </th>
 
-                <td>{{v[0]}}</td>
-                <td>{{v[1]}}</td>
+                <td v-if="k == 'Итого'" scope="row" class="table-active"> <b>{{k}}</b> </td>
+                <td v-else scope="row" > {{k}} </td>
+
+                <td v-if="k == 'Итого'" class="table-active"> <b>{{v[0]}}</b></td>
+                <td v-else>{{v[0]}}</td>
+
+                <td v-if="k == 'Итого'" class="table-active"> <b>{{v[1]}}</b></td>
+                <td v-else>{{v[1]}}</td>
+
+                <td v-if="k == 'Итого'" class="table-active"> <b>{{v[0]+v[1]}}</b></td>
+                <td v-else>{{v[0]+v[1]}}</td>
+
                 <td v-if="v[2] > 79"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>
@@ -69,21 +78,31 @@
      <div v-for = "(value,key) in season_data[0].analytics_gender_age">
      <h2>{{key}}</h2>
          <table class="table table-sm">
-          <thead>
+          <thead class="thead-light">
             <tr>
               <th scope="col">Группа</th>
               <th scope="col">Продано, шт.</th>
               <th scope="col">Остаток, шт.</th>
+              <th scope="col">Всего, шт.</th>
               <th scope="col">Процент реализации</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-for = "(v,k) in value">
-                <th scope="row" style = font-weight:normal > {{k}} </th>
 
-                <td>{{v[0]}}</td>
-                <td>{{v[1]}}</td>
+                <td v-if="k == 'Итого'" scope="row" class="table-active"> <b>{{k}}</b> </td>
+                <td v-else scope="row" > {{k}} </td>
+
+                <td v-if="k == 'Итого'" class="table-active"> <b>{{v[0]}}</b></td>
+                <td v-else>{{v[0]}}</td>
+
+                <td v-if="k == 'Итого'" class="table-active"> <b>{{v[1]}}</b></td>
+                <td v-else>{{v[1]}}</td>
+
+                <td v-if="k == 'Итого'" class="table-active"> <b>{{v[0]+v[1]}}</b></td>
+                <td v-else>{{v[0]+v[1]}}</td>
+
                 <td v-if="v[2] > 79"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>
                 <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>

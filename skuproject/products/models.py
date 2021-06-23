@@ -16,13 +16,13 @@ CLOTHES_TYPE_CHOICES = [
     ('OUTERWEAR', 'Верхняя одежда'),
     ('DRESS', 'Платье'),
     ('SPORTPANTS', 'Спортивные брюки'),
-    ('PANTS', 'Брюки'),
+    ('PANTS', 'Брюки текстиль'),
     ('JEANS','Джинсы'),
     ('SHORTS', 'Шорты'),
     ('SKIRT', 'Юбка'),
-    ('CAP', 'Бейсболка'),
+    ('CAP', 'Бейсболки, панамы'),
     ('HAT', 'Шапка'),
-    ('SCARF', 'Шарф'),
+    ('SCARF', 'Шарфы, воротники'),
     ('SWIMSUIT', 'Купальники и плавки'),
     ('SOCKS', 'Носки'),
     ('PANTIES', 'Трусы'),
@@ -144,6 +144,20 @@ class Season(models.Model):
                     if q_sold+q_instock != 0:
                         percent = round(q_sold*100/(q_sold+q_instock)) # Процент реализации
                         final_dict[i[1]]=[q_sold, q_instock, percent]
+
+                if final_dict:
+                    summ_sold = 0
+                    summ_instock = 0
+                    percent_total = 0
+                    for k, v in final_dict.items():
+                        summ_sold += v[0]
+                        summ_instock += v[1]
+
+                    if summ_sold + summ_instock != 0:
+                        percent_total = round(summ_sold * 100 / (summ_sold + summ_instock))  # Процент реализации
+
+                    final_dict['Итого'] = [summ_sold, summ_instock, percent_total]
+
                 if final_dict:
                     gender_age_str = gender[1] + ' ' + age[1]
                     superfinal_dict[gender_age_str] = final_dict

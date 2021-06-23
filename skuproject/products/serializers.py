@@ -82,7 +82,8 @@ class SkuSerializer(ModelSerializer):
                   'rating_income',
                   'rating_sellsumm_sold',
                   'rating_quantity',
-                  'clothes_type'
+                  # 'clothes_type',
+                  'get_clothes_type_display'
                   ]
 
 
