@@ -117,9 +117,11 @@ def handle_uploaded_file(excel_file, user_id):
     school_clothestype_configlist = []
     age_configlist= []
     exceptions_configlist=[]
+    analogues_configlist =[]
     error_message = ''
     seasonname_from_config = ''
     capsulename_from_config = ''
+
     try:
         config = configparser.ConfigParser()
         config.read('sku_config.ini')
@@ -138,6 +140,8 @@ def handle_uploaded_file(excel_file, user_id):
         exceptions_configlist = config['Exceptions']
     if 'School Clothestypes' in config.sections():
         school_clothestype_configlist = config['School Clothestypes']
+    if 'Analogues' in config.sections():
+        analogues_configlist = config['Analogues']
 
     # Reading Excel file
     try:
@@ -356,6 +360,7 @@ def handle_uploaded_file(excel_file, user_id):
 
         ### SKU_NOSIZE, SIZELONG, SIZESHORT, SKU_NAME ###
         sku_name = ''
+        analogue= ''
         t = work_cell.find('-')
 
         if t != -1:
@@ -419,6 +424,12 @@ def handle_uploaded_file(excel_file, user_id):
             clothestype = define_clothestype(sku_name, school_clothestype_configlist)
         else:
             clothestype = define_clothestype(sku_name, clothestype_configlist)
+
+        ### ANALOGUE ###
+        if season == '220GS' or season == '200GS':
+            if sku_nosize in analogues_configlist:
+                analogue = analogues_configlist[sku_nosize]
+
 
         # Add Season
         if season not in seasons_checklist:
@@ -495,7 +506,8 @@ def handle_uploaded_file(excel_file, user_id):
                                 capsule=Capsule(id=capsule_id),
                                 user=user_id,
                                 img=image_sku,
-                                clothes_type = clothestype
+                                clothes_type=clothestype,
+                                analogue=analogue
                                 ))
 
         # Add Size

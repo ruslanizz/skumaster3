@@ -335,6 +335,7 @@ class SKU(models.Model):
     rating_sellsumm_sold = models.PositiveSmallIntegerField(default=0, editable=False)
     rating_quantity = models.PositiveSmallIntegerField(default=0, editable=False)
     clothes_type = models.CharField(max_length=10, choices=CLOTHES_TYPE_CHOICES, default='OTHER')
+    analogue = models.CharField(max_length=15, default='', blank=True)
 
     def __str__(self):
         return f'{self.sku_firstletters} - {self.name}'
