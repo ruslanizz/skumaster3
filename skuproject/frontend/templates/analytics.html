@@ -9,7 +9,7 @@
 <div class="container">
   <h1 class="display-5">Аналитика по сезону</h1>
   <p class="lead">
-    Аналитику считайте в конце сезона, причем загрузите данные с самого начала продаж. <br>
+    Аналитику считайте в конце сезона, причем загрузите данные с самого начала продаж этого сезона. <br>
     Например, если первая поставка сезона Весна-Лето у вас была в январе - загрузите данные с 1 января по сегодняшний день.
   </p>
 
@@ -17,7 +17,18 @@
 
     <h1>Сезон: {{capsules_data[0].get_season_name}}</h1>
 
-<div class="container">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link" v-bind:class="{active : tabSelector == 1}" v-on:click="tabSelector=1">По капсулам</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" v-bind:class="{active : tabSelector == 2}" v-on:click="tabSelector=2">По половозрастным группам</a>
+      </li>
+    </ul>
+<br>
+
+<!--   First container with Analytics by Capsules   -->
+<div class="container" v-if="tabSelector==1">
     <div v-for="i in sortedCapsulesData">
 
        <h5> {{i.name}}
@@ -59,24 +70,23 @@
                 <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>
                 <td v-else> {{v[2]}} % </td>
 
-
-                </tr>
-            </div>
+            </tr>
           </tbody>
 
         </table>
-
-
-        <br>
     </div>
+        <br>
+</div>
+<!--End first container-->
 
 
+<!--   Second container with Analytics by Gender and Age   -->
 
+ <div class="container" v-else-if = "tabSelector==2">
+<!--     <h1>Итого по половозрастным группам</h1>-->
 
- <div class="container">
-     <h1>Итого по половозрастным группам</h1>
      <div v-for = "(value,key) in season_data[0].analytics_gender_age">
-     <h2>{{key}}</h2>
+        <h5>{{key}}</h5>
          <table class="table table-sm">
           <thead class="thead-light">
             <tr>
@@ -109,50 +119,21 @@
                 <td v-else> {{v[2]}} % </td>
 
             </tr>
-
           </tbody>
-
         </table>
 
-<!--     <h2>МАЛЬЧИКИ МИНИ</h2>-->
-
-<!--         <table class="table table-sm">-->
-<!--          <thead>-->
-<!--            <tr>-->
-<!--              <th scope="col">Группа</th>-->
-<!--              <th scope="col">Продано, шт.</th>-->
-<!--              <th scope="col">Остаток, шт.</th>-->
-<!--              <th scope="col">Процент реализации</th>-->
-<!--            </tr>-->
-<!--          </thead>-->
-
-<!--          <tbody>-->
-<!--            <tr v-for = "(v,k) in season_data[0].analytics_boys_mini">-->
-<!--                <th v-if="k != 'Итого'" scope="row" style = font-weight:normal > {{k}} </th>-->
-<!--                <th v-else scope="row" > {{k}} </th>-->
-
-<!--                <td>{{v[0]}}</td>-->
-<!--                <td>{{v[1]}}</td>-->
-<!--                <td v-if="v[2] > 79"> <span class="bg-success text-white"> {{v[2]}} % </span> </td>-->
-<!--                <td v-else-if="v[2] < 35"> <span class="bg-danger text-white"> {{v[2]}} % </span> </td>-->
-<!--                <td v-else-if="v[2] > 35 && v[2] < 50"> <span class="bg-warning text-dark"> {{v[2]}} % </span> </td>-->
-<!--                <td v-else> {{v[2]}} % </td>-->
-
-<!--            </tr>-->
-
-<!--          </tbody>-->
-
-<!--        </table>-->
+     </div>
  </div>
- </div>
+<!--End second container-->
+
+
+
 
 
 
 
 
 </div>
-
-
 
 </div>
 <br>

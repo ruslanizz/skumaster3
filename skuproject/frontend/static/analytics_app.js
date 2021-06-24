@@ -2,6 +2,7 @@ new Vue({
     el:'#analyticsapp',
     data: {
         sortParam: '',
+        tabSelector: 1,
         capsules_data: [],
         season_data: [],
         },
